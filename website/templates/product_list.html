@@ -56,15 +56,16 @@
                 <div class="col-md-8">
                     <div class="product_list">
                         <div class="row">
+                            {% for product in products %}
                             <div class="col-lg-6 col-sm-6">
                                 <div class="single_product_item">
-                                    <img src="{% static 'website/img/product/product_list_1.png' %}" alt="#" class="img-fluid">
-                                    <h3> <a href="single-product.html">Cervical pillow for airplane
-                                    car office nap pillow</a> </h3>
-                                    <p>From $5</p>
+                                    <img src="{{product.image.url}}" alt="#" class="img-fluid">
+                                    <h3> <a href="single-product.html">{{ product.name }}</a> </h3>
+                                    <p>From {{ product.price}}</p>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-sm-6">
+                            {% endfor %}
+                            <!-- <div class="col-lg-6 col-sm-6">
                                 <div class="single_product_item">
                                     <img src="{% static 'website/img/product/product_list_2.png' %}" alt="#" class="img-fluid">
                                     <h3> <a href="single-product.html">Geometric striped flower home classy decor</a> </h3>
@@ -126,7 +127,7 @@
                                     <h3> <a href="single-product.html">Geometric striped flower home classy decor</a> </h3>
                                     <p>From $5</p>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="load_more_btn text-center">
                             <a href="#" class="btn_3">Load More</a>
