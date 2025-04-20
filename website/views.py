@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import Product
 
 # Create your views here.
 
@@ -12,4 +13,5 @@ def contact(request):
     return render(request, 'contact.html', {}) 
 
 def product_list(request):
-    return render(request, 'product_list.html', {})
+    products = Product.objects.all()
+    return render(request, 'product_list.html', {'products': products})
