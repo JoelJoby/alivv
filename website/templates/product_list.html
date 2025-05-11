@@ -57,13 +57,29 @@
                     <div class="product_list">
                         <div class="row">
                             {% for product in products %}
-                            <div class="col-lg-6 col-sm-6">
-                                <div class="single_product_item">
-                                    <img src="{{product.image.url}}" alt="#" class="img-fluid">
-                                    <h3> <a href="single-product.html">{{ product.name }}</a> </h3>
-                                    <p>From {{ product.price}}</p>
+                                {% if product.is_sale %}
+                                <div class="col-lg-6 col-sm-6">
+                                    <div class="single_product_item">
+                                        <div class="badge badge-danger position-absolute" style="top: 10px; right: 10px; font-size: 12px; font-weight: 600; padding: 5px 10px;">
+                                            Sale
+                                        </div>
+                                        <img src="{{product.image.url}}" alt="#" class="img-fluid">
+                                        <h3> <a href="single-product.html">{{ product.name }}</a> </h3>
+                                        <strike>
+                                            <p>Rs {{ product.price}}</p>
+                                        </strike>
+                                        <p>Rs {{ product.sale_price}}</p>
+                                    </div>
                                 </div>
-                            </div>
+                                {% else %}
+                                <div class="col-lg-6 col-sm-6">
+                                    <div class="single_product_item">
+                                        <img src="{{product.image.url}}" alt="#" class="img-fluid">
+                                        <h3> <a href="single-product.html">{{ product.name }}</a> </h3>
+                                        <p>Rs {{ product.price}}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
                             {% endfor %}
                             <!-- <div class="col-lg-6 col-sm-6">
                                 <div class="single_product_item">
