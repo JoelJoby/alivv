@@ -1,8 +1,14 @@
 from django.db import models
 import datetime
 
+from django.utils.text import slugify
+
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    
+    def get_url_name(self):
+        return slugify(self.name)
+    
     def __str__(self):
         return self.name
     
