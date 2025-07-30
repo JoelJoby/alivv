@@ -49,8 +49,11 @@
                     </div>
                     <p>Rs {{ product.sale_price }}</p>
                 </div>
-              <div class="add_to_cart">
-                  <a href="#" class="btn_3">add to cart</a>
+                <div class="buy_now">
+					<a href="#" class="btn_3" id="buyNowBtn">
+					Buy Now
+				  	</a>
+            	</div>
               </div>
             </div>
           </div>
@@ -77,5 +80,23 @@
       </div>
   </section>
   <!-- subscribe part end -->
+
+  <script>
+	document.getElementById("buyNowBtn").addEventListener("click", function (e) {
+	  e.preventDefault();
+  
+	  const quantity = document.querySelector('.input-number').value || 1;
+	  const productName = "{{ product.name }}";
+	  const productURL = "{{ request.build_absolute_uri }}";
+  
+	  const message = `Hello Admin, a user is interested in: ${productName}. Quantity: ${quantity}. View it here: ${productURL}`;
+	  const encodedMessage = encodeURIComponent(message);
+	  const whatsappNumber = "918078800396";  // Replace with your WhatsApp number
+  
+	  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+	  window.open(whatsappLink, '_blank');
+	});
+  </script>
+  
         
 {% endblock %}

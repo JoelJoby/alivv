@@ -23,9 +23,14 @@ def product_list(request):
         'categories': categories
     })
 
-def product(request ,pk):
+def product(request, pk):
     product = Product.objects.get(id=pk)
-    return render(request, 'product.html', {'product': product})
+    product_url = request.build_absolute_uri()
+
+    return render(request, 'product.html', {
+        'product': product,
+        'product_url': product_url,  # Optional if you want to use it
+    })
 
 def category(request, cat):
     all_categories = Category.objects.all()
