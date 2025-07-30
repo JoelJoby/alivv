@@ -7,7 +7,13 @@ from .models import Product,Category
 # Create your views here.
 
 def home(request):
-    return render(request, 'home.html', {})
+    top_categories = Category.objects.filter(is_top_category=True).order_by('priority')[:3]
+    top_products = Product.objects.filter(is_top_product=True).order_by('priority')[:6]
+
+    return render(request, 'home.html', {
+        'top_categories': top_categories,
+        'top_products': top_products,
+    })
 
 def about(request):
     return render(request, 'about.html', {})

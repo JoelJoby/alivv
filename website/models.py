@@ -5,7 +5,12 @@ from django.utils.text import slugify
 class Category(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='uploads/category/', default='default/category_default.jpg')
-    
+    is_top_category = models.BooleanField(default=False, help_text="Select this to mark as a Top Category")
+    priority = models.PositiveIntegerField(
+        default=0,
+        help_text="Use 1, 2, or 3 to define order for top categories. Leave as 0 if not a top category."
+    )
+
     def get_url_name(self):
         return slugify(self.name)
     
@@ -27,9 +32,17 @@ class Product(models.Model):
     category    = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=300, default='', blank=True, null=True)
     image       = models.ImageField(upload_to='uploads/products/')
+    
     # Sale Stuff
     is_sale     = models.BooleanField(default=False)
     sale_price  = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+    
+    # Top Product Fields
+    is_top_product = models.BooleanField(default=False, help_text="Mark as Top Product (max 6)")
+    priority = models.PositiveIntegerField(
+        default=0,
+        help_text="Use numbers 1 to 6 for top product priority. Leave 0 if not top."
+    )
 
     def __str__(self):
         return self.name
