@@ -32,67 +32,32 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
+                    {% for cat in top_categories %}
                     <div class="single_product_iner">
                         <div class="row align-items-center justify-content-between">
                             <div class="col-lg-6 col-sm-6">
                                 <div class="single_product_img">
-                                    <img src="{%static 'website/img/single_product_1.png'%}" class="img-fluid" alt="#">
-                                    <img src="{%static 'website/img/product_overlay.png'%}" alt="#" class="product_overlay img-fluid">
+                                    <img src="{{ cat.image.url }}" class="img-fluid" alt="{{ cat.name }}">
+                                    <img src="{% static 'website/img/product_overlay.png' %}" alt="#" class="product_overlay img-fluid">
                                 </div>
                             </div>
                             <div class="col-lg-5 col-sm-6">
                                 <div class="single_product_content">
-                                    <h5>Started from $10</h5>
-                                    <h2> <a href="single-product.html">Printed memory foam 
-                                        brief modern throw 
-                                        pillow case</a> </h2>
-                                    <a href="product_list.html" class="btn_3">Explore Now</a>
+                                    <h5>Explore Category</h5>
+                                    <h2>
+                                        <a href="{% url 'category' cat.get_url_name %}">{{ cat.name }}</a>
+                                    </h2>
+                                    <a href="{% url 'category' cat.get_url_name %}" class="btn_3">Explore Now</a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="single_product_iner">
-                        <div class="row align-items-center justify-content-between">
-                            <div class="col-lg-6 col-sm-6">
-                                <div class="single_product_img">
-                                    <img src="{%static 'website/img/single_product_2.png'%}" class="img-fluid" alt="#">
-                                    <img src="{%static 'website/img/product_overlay.png'%}" alt="#" class="product_overlay img-fluid">
-                                </div>
-                            </div>
-                            <div class="col-lg-5 col-sm-6">
-                                <div class="single_product_content">
-                                    <h5>Started from $10</h5>
-                                    <h2> <a href="single-product.html">Printed memory foam 
-                                        brief modern throw 
-                                        pillow case</a> </h2>
-                                    <a href="product_list.html" class="btn_3">Explore Now</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="single_product_iner">
-                        <div class="row align-items-center justify-content-between">
-                            <div class="col-lg-6 col-sm-6">
-                                <div class="single_product_img">
-                                    <img src="{%static 'website/img/single_product_3.png'%}" class="img-fluid" alt="#">
-                                    <img src="{%static 'website/img/product_overlay.png'%}" alt="#" class="product_overlay img-fluid">
-                                </div>
-                            </div>
-                            <div class="col-lg-5 col-sm-6">
-                                <div class="single_product_content">
-                                    <h5>Started from $10</h5>
-                                    <h2> <a href="single-product.html">Printed memory foam 
-                                            brief modern throw 
-                                            pillow case</a> </h2>
-                                    <a href="product_list.html" class="btn_3">Explore Now</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </section>
+    
     <!-- product list end-->
 
 
@@ -107,55 +72,28 @@
                 </div>
             </div>
             <div class="row">
+                {% for product in top_products %}
                 <div class="col-lg-4 col-sm-6">
                     <div class="single_product_item">
                         <div class="single_product_item_thumb">
-                            <img src="{%static 'website/img/tranding_item/tranding_item_1.png'%}" alt="#" class="img-fluid">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
                         </div>
-                        <h3> <a href="single-product.html">Cervical pillow for airplane
-                        car office nap pillow</a> </h3>
-                        <p>From $5</p>  
+                        <h3>
+                            <a href="{% url 'product' product.id %}">{{ product.name }}</a>
+                        </h3>
+                        <p>
+                            {% if product.is_sale %}
+                                Rs {{ product.sale_price }}
+                            {% else %}
+                                Rs {{ product.price }}
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="single_product_item">
-                        <img src="{%static 'website/img/tranding_item/tranding_item_2.png'%}" alt="#" class="img-fluid">
-                        <h3> <a href="single-product.html">Foam filling cotton slow rebound pillows</a> </h3>
-                        <p>From $5</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="single_product_item">
-                        <img src="{%static 'website/img/tranding_item/tranding_item_3.png'%}" alt="#" class="img-fluid">
-                        <h3> <a href="single-product.html">Memory foam filling cotton Slow rebound pillows</a> </h3>
-                        <p>From $5</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="single_product_item"> 
-                        <img src="{%static 'website/img/tranding_item/tranding_item_4.png'%}" alt="#" class="img-fluid">
-                        <h3> <a href="single-product.html">Cervical pillow for airplane
-                        car office nap pillow</a> </h3>
-                        <p>From $5</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="single_product_item">
-                        <img src="{%static 'website/img/tranding_item/tranding_item_5.png'%}" alt="#" class="img-fluid">
-                        <h3> <a href="single-product.html">Foam filling cotton slow rebound pillows</a> </h3>
-                        <p>From $5</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="single_product_item">
-                        <img src="{%static 'website/img/tranding_item/tranding_item_6.png'%}" alt="#" class="img-fluid">
-                        <h3> <a href="single-product.html">Memory foam filling cotton Slow rebound pillows</a> </h3>
-                        <p>From $5</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
-    </section>
+    </section>    
     <!-- trending item end-->
 
     <!-- client review part here -->
@@ -164,32 +102,20 @@
             <div class="row justify-content-center"> 
                 <div class="col-lg-8">
                     <div class="client_review_slider owl-carousel">
-                        <div class="single_client_review">
-                            <div class="client_img">
-                                <img src="{%static 'website/img/client.png'%}" alt="#">
+                        {% for testimonial in testimonials %}
+                            <div class="single_client_review">
+                                <div class="client_img">
+                                    <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}">
+                                </div>
+                                <p>"{{ testimonial.remark }}"</p>
+                                <h5>- {{ testimonial.name }}</h5>
                             </div>
-                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering.</p>
-                            <h5>- Micky Mouse</h5>
-                        </div>
-                        <div class="single_client_review">
-                            <div class="client_img">
-                                <img src="{%static 'website/img/client_1.png'%}" alt="#">
-                            </div>
-                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering.</p>
-                            <h5>- Micky Mouse</h5>
-                        </div>
-                        <div class="single_client_review">
-                            <div class="client_img">
-                                <img src="{%static 'website/img/client_2.png'%}" alt="#">
-                            </div>
-                            <p>"Working in conjunction with humanitarian aid agencies, we have supported programmes to help alleviate human suffering.</p>
-                            <h5>- Micky Mouse</h5>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </section>    
     <!-- client review part end -->
 
 

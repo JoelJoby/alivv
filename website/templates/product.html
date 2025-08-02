@@ -21,17 +21,20 @@
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-lg-12">
-          <div class="product_img_slide owl-carousel">
-            <div class="single_product_img">
-              <img src="{{product.image.url }}" alt="#" class="img-fluid">
-            </div>
-            <div class="single_product_img">
-              <img src="img/product/single_product.png" alt="#" class="img-fluid">
-            </div>
-            <div class="single_product_img">
-              <img src="img/product/single_product.png" alt="#" class="img-fluid">
-            </div>
-          </div>
+			<div class="product_img_slide owl-carousel">
+				{% for img in product_images %}
+				  <div class="single_product_img">
+					<img src="{{ img.image.url }}" alt="{{ img.alt_text|default:product.name }}" class="img-fluid">
+				  </div>
+				{% endfor %}
+				
+				<!-- Fallback to main image if no additional images -->
+				{% if not product_images %}
+				  <div class="single_product_img">
+					<img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+				  </div>
+				{% endif %}
+			</div>			  
         </div>
         <div class="col-lg-8">
           <div class="single_product_text text-center">
@@ -49,8 +52,11 @@
                     </div>
                     <p>Rs {{ product.sale_price }}</p>
                 </div>
-              <div class="add_to_cart">
-                  <a href="#" class="btn_3">add to cart</a>
+                <div class="buy_now">
+					<a href="#" class="btn_3" id="buyNowBtn">
+					Buy Now
+				  	</a>
+            	</div>
               </div>
             </div>
           </div>
@@ -77,5 +83,23 @@
       </div>
   </section>
   <!-- subscribe part end -->
+
+  <script>
+	document.getElementById("buyNowBtn").addEventListener("click", function (e) {
+	  e.preventDefault();
+  
+	  const quantity = document.querySelector('.input-number').value || 1;
+	  const productName = "{{ product.name }}";
+	  const productURL = "{{ request.build_absolute_uri }}";
+  
+	  const message = `Hello Admin, a user is interested in: ${productName}. Quantity: ${quantity}. View it here: ${productURL}`;
+	  const encodedMessage = encodeURIComponent(message);
+	  const whatsappNumber = "918078800396";  // Replace with your WhatsApp number
+  
+	  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+	  window.open(whatsappLink, '_blank');
+	});
+  </script>
+  
         
 {% endblock %}
