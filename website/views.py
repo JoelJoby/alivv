@@ -18,7 +18,10 @@ def home(request):
     })
 
 def about(request):
-    return render(request, 'about.html', {})
+    testimonials = Testimonial.objects.all()
+    return render(request, 'about.html', {
+        'testimonials': testimonials,
+    })
 
 def contact(request):
     return render(request, 'contact.html', {}) 
@@ -26,9 +29,11 @@ def contact(request):
 def product_list(request):
     products = Product.objects.all()
     categories = Category.objects.all()  # Get all categories
+    testimonials = Testimonial.objects.all()
     return render(request, 'product_list.html', {
         'products': products,
-        'categories': categories
+        'categories': categories,
+        'testimonials': testimonials,
     })
 
 def product(request, pk):
