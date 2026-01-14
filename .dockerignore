@@ -1,0 +1,36 @@
+# Python cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env
+.python-version
+
+# Local development databases
+*.sqlite3
+
+# Media & collected static (don't send to Docker image)
+media/
+staticfiles/
+
+# Git stuff (no need in image)
+.git
+.gitignore
+.gitattributes
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS junk (if you ever use Mac)
+.DS_Store
+
+# Logs & temp
+*.log
+tmp/
+temp/
