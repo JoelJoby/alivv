@@ -4,7 +4,11 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='uploads/category/', default='default/category_default.jpg')
+    image = models.ImageField(
+        upload_to='uploads/category/', 
+        default='default/category_default.jpg',
+        help_text="Please upload an image for the category in 520*435 resolution."
+    )
     is_top_category = models.BooleanField(default=False, help_text="Select this to mark as a Top Category")
     priority = models.PositiveIntegerField(
         default=0,
@@ -17,12 +21,25 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
+class Season(models.Model):
+    name = models.CharField(max_length=100)
+    banner_image = models.ImageField(
+        upload_to='uploads/seasons/',
+        help_text="Please upload an image for the Home Page Banner in 1080*800 resolution.")
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
 class Product(models.Model):
     name        = models.CharField(max_length=100)
     price       = models.DecimalField(default=0, decimal_places=2, max_digits=6)
     category    = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=300, default='', blank=True, null=True)
-    image       = models.ImageField(upload_to='uploads/products/')
+    image       = models.ImageField(
+        upload_to='uploads/products/',
+        help_text="Please upload an image for the product in 360*250 resolution.")
     
     # Sale Stuff
     is_sale     = models.BooleanField(default=False)
@@ -50,7 +67,10 @@ class ProductImage(models.Model):
 
 class Testimonial(models.Model):
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='uploads/testimonials/', default='default/testimonial_default.jpg')
+    image = models.ImageField(
+        upload_to='uploads/testimonials/', 
+        default='default/testimonial_default.jpg'
+    )
     remark = models.TextField()
 
     def __str__(self):
