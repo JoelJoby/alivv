@@ -5,7 +5,8 @@ from .models import (
     Product,
     ProductImage,
     Order,
-    Testimonial,  # If you added it
+    Testimonial,
+    Season, 
 )
 
 # Register models only once
@@ -15,3 +16,4 @@ admin.site.register(Product)
 admin.site.register(ProductImage)
 admin.site.register(Order)
 admin.site.register(Testimonial)
+admin.site.register(Season)

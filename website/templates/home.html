@@ -21,7 +21,11 @@
         </div>
     </div>
     <div class="banner_img">
+        {% if season and season.banner_image %}
+        <img src="{{ season.banner_image.url }}" alt="{{ season.name }}" class="img-fluid">
+        {% else %}
         <img src="{%static 'website/img/banner.png'%}" alt="#" class="img-fluid">
+        {% endif %}
         <img src="{%static 'website/img/banner_pattern.png'%} " alt="#" class="pattern_img img-fluid">
     </div>
 </section>

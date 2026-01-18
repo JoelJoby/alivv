@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django import forms 
 
-from .models import Product,Category,Testimonial
+from .models import Product,Category,Testimonial,Season
 
 # Create your views here.
 
@@ -10,11 +10,13 @@ def home(request):
     top_categories = Category.objects.filter(is_top_category=True).order_by('priority')[:3]
     top_products = Product.objects.filter(is_top_product=True).order_by('priority')[:6]
     testimonials = Testimonial.objects.all()
+    season = Season.objects.filter(is_active=True).first()
 
     return render(request, 'home.html', {
         'top_categories': top_categories,
         'top_products': top_products,
         'testimonials': testimonials,
+        'season': season,
     })
 
 def about(request):
