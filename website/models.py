@@ -60,7 +60,7 @@ class Product(models.Model):
     description = models.CharField(max_length=300, default='', blank=True, null=True)
     image       = models.ImageField(
         upload_to=product_image_path,
-        help_text="Please upload an image for the product in 360*250 resolution.")
+        help_text="Please upload an image for the product in 360*380 resolution.")
     
     # Sale Stuff
     is_sale     = models.BooleanField(default=False)
