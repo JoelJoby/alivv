@@ -52,11 +52,19 @@ class Season(models.Model):
 
     def __str__(self):
         return self.name
+
+class Size(models.Model):
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=20, default='', blank=True, null=True)
+    
+    def __str__(self):
+        return self.name
     
 class Product(models.Model):
     name        = models.CharField(max_length=100)
     price       = models.DecimalField(default=0, decimal_places=2, max_digits=6)
     category    = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
+    sizes       = models.ManyToManyField(Size, blank=True)
     description = models.CharField(max_length=300, default='', blank=True, null=True)
     image       = models.ImageField(
         upload_to=product_image_path,
@@ -118,4 +126,11 @@ class Order(models.Model):
     status = models.BooleanField(default=False)
     
     def __str__(self):
-        return self.product
+        return f"{self.product} - {self.quantity}"
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

@@ -96,12 +96,8 @@
                         sources
                         credibly innovate granular internal .</p>
                     <div class="subscribe_form">
-                        <form action="{% url 'subscribe' %}" method="POST">
-                            {% csrf_token %}
-                            <input type="email" name="email" placeholder="Enter your mail" required>
-                            <button type="submit" class="btn_1"
-                                style="border: none; cursor: pointer;">Subscribe</button>
-                        </form>
+                        <input type="email" placeholder="Enter your mail">
+                        <a href="#" class="btn_1">Subscribe</a>
                     </div>
                 </div>
             </div>

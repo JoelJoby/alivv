@@ -2,7 +2,21 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django import forms 
 
-from .models import Product,Category,Testimonial,Season
+from .models import Product,Category,Testimonial,Season,Subscriber
+
+def subscribe(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if email:
+            if Subscriber.objects.filter(email=email).exists():
+                messages.warning(request, "You are already subscribed with this email!")
+            else:
+                Subscriber.objects.create(email=email)
+                messages.success(request, "Thank you for subscribing!")
+        else:
+             messages.error(request, "Please provide a valid email address.")
+             
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
 
 # Create your views here.
 

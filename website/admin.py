@@ -7,13 +7,21 @@ from .models import (
     Order,
     Testimonial,
     Season, 
+    Size,
+    Subscriber,
 )
 
 # Register models only once
 admin.site.register(Category)
 admin.site.register(Customer)
-admin.site.register(Product)
 admin.site.register(ProductImage)
 admin.site.register(Order)
 admin.site.register(Testimonial)
 admin.site.register(Season)
+admin.site.register(Size)
+admin.site.register(Subscriber)
+
+class ProductAdmin(admin.ModelAdmin):
+    filter_horizontal = ('sizes',)
+
+admin.site.register(Product, ProductAdmin)
