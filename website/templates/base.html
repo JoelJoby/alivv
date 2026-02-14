@@ -97,12 +97,11 @@
                                 </li>
                             </ul>
                         </div>
-                        <!-- <div class="hearer_icon d-flex align-items-center">
-                            <a id="search_1" href="javascript:void(0)"><i class="ti-search"></i></a>
+                        <div class="hearer_icon d-flex align-items-center">
                             <a href="cart.html">
                                 <i class="flaticon-shopping-cart-black-shape"></i>
                             </a>
-                        </div> -->
+                        </div>
                     </nav>
                 </div>
             </div>
@@ -118,6 +117,19 @@
         </div> -->
     </header>
     <!-- Header part end-->
+
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     {% block content%}
 

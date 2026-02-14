@@ -1,11 +1,32 @@
 from django.db import models
 import datetime
+import os
 from django.utils.text import slugify
+
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (datetime.datetime.now().strftime("%Y%m%d%H%M%S"), ext)
+    return filename
+
+def category_image_path(instance, filename):
+    return os.path.join('uploads/category/', get_file_path(instance, filename))
+
+def season_image_path(instance, filename):
+    return os.path.join('uploads/seasons/', get_file_path(instance, filename))
+
+def product_image_path(instance, filename):
+    return os.path.join('uploads/products/', get_file_path(instance, filename))
+
+def product_gallery_image_path(instance, filename):
+    return os.path.join('uploads/products/images/', get_file_path(instance, filename))
+
+def testimonial_image_path(instance, filename):
+    return os.path.join('uploads/testimonials/', get_file_path(instance, filename))
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(
-        upload_to='uploads/category/', 
+        upload_to=category_image_path, 
         default='default/category_default.jpg',
         help_text="Please upload an image for the category in 520*435 resolution."
     )
@@ -24,11 +45,18 @@ class Category(models.Model):
 class Season(models.Model):
     name = models.CharField(max_length=100)
     banner_image = models.ImageField(
-        upload_to='uploads/seasons/',
+        upload_to=season_image_path,
         help_text="Please upload an image for the Home Page Banner in 1080*800 resolution.")
     description = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.name
+
+class Size(models.Model):
+    name = models.CharField(max_length=50)
+    code = models.CharField(max_length=20, default='', blank=True, null=True)
+    
     def __str__(self):
         return self.name
     
@@ -36,10 +64,11 @@ class Product(models.Model):
     name        = models.CharField(max_length=100)
     price       = models.DecimalField(default=0, decimal_places=2, max_digits=6)
     category    = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
+    sizes       = models.ManyToManyField(Size, blank=True)
     description = models.CharField(max_length=300, default='', blank=True, null=True)
     image       = models.ImageField(
-        upload_to='uploads/products/',
-        help_text="Please upload an image for the product in 360*250 resolution.")
+        upload_to=product_image_path,
+        help_text="Please upload an image for the product in 360*380 resolution.")
     
     # Sale Stuff
     is_sale     = models.BooleanField(default=False)
@@ -57,7 +86,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='uploads/products/images/')
+    image = models.ImageField(upload_to=product_gallery_image_path)
     alt_text = models.CharField(max_length=100, blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,7 +97,7 @@ class ProductImage(models.Model):
 class Testimonial(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(
-        upload_to='uploads/testimonials/', 
+        upload_to=testimonial_image_path, 
         default='default/testimonial_default.jpg'
     )
     remark = models.TextField()
@@ -97,4 +126,11 @@ class Order(models.Model):
     status = models.BooleanField(default=False)
     
     def __str__(self):
-        return self.product
+        return f"{self.product} - {self.quantity}"
+
+class Subscriber(models.Model):
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

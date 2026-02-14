@@ -21,7 +21,11 @@
         </div>
     </div>
     <div class="banner_img">
+        {% if season and season.banner_image %}
+        <img src="{{ season.banner_image.url }}" alt="{{ season.name }}" class="img-fluid">
+        {% else %}
         <img src="{%static 'website/img/banner.png'%}" alt="#" class="img-fluid">
+        {% endif %}
         <img src="{%static 'website/img/banner_pattern.png'%} " alt="#" class="pattern_img img-fluid">
     </div>
 </section>
@@ -178,8 +182,12 @@
                     <p>Seamlessly empower fully researched growth strategies and interoperable internal or “organic”
                         sources credibly innovate granular internal .</p>
                     <div class="subscribe_form">
-                        <input type="email" placeholder="Enter your mail">
-                        <a href="#" class="btn_1">Subscribe</a>
+                        <form action="{% url 'subscribe' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="email" name="email" placeholder="Enter your mail" required>
+                            <button type="submit" class="btn_1"
+                                style="border: none; cursor: pointer;">Subscribe</button>
+                        </form>
                     </div>
                 </div>
             </div>
