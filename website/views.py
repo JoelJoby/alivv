@@ -264,3 +264,50 @@ def change_item_size(request):
             messages.success(request, "Size updated successfully.")
             
     return redirect('cart_detail')
+
+def checkout(request):
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total_amount = 0
+    
+    # Extract authentic product IDs from complex keys
+    product_ids = set()
+    for key in cart.keys():
+        # Key format: "id-size" or "id"
+        pid = key.split('-')[0]
+        if pid.isdigit():
+            product_ids.add(int(pid))
+            
+    products = Product.objects.filter(id__in=product_ids)
+    
+    # Create a lookup dictionary for efficient access
+    product_map = {p.id: p for p in products}
+    
+    for item_id, quantity in cart.items():
+        # Parse item_id to get product ID and size
+        parts = item_id.split('-')
+        p_id_str = parts[0]
+        size = parts[1] if len(parts) > 1 else None
+        
+        if not p_id_str.isdigit():
+            continue
+            
+        product = product_map.get(int(p_id_str))
+        if product:
+            price = product.sale_price if product.is_sale else product.price
+            item_total = price * quantity
+            
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'price': price,
+                'total_price': item_total,
+                'size': size,
+                'item_id': item_id  # Pass the unique key for removing/updating
+            })
+            total_amount += item_total
+            
+    return render(request, 'checkout.html', {
+        'cart_items': cart_items,
+        'total_amount': total_amount
+    })
