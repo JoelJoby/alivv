@@ -11,6 +11,7 @@ urlpatterns = [
     path('subscribe', views.subscribe, name="subscribe"),
     path('cart/add/<int:pk>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.cart_detail, name='cart_detail'),
-    path('cart/remove/<int:pk>/', views.remove_from_cart, name='remove_from_cart'),
+    path('cart/remove/<str:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/', views.update_cart, name='update_cart'),
+    path('cart/change-size/', views.change_item_size, name='change_item_size'),
 ]
