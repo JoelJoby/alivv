@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django import forms 
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import AuthenticationForm
 
 from .models import Product,Category,Testimonial,Season,Subscriber,Size
 
@@ -311,3 +313,27 @@ def checkout(request):
         'cart_items': cart_items,
         'total_amount': total_amount
     })
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"You are now logged in as {username}.")
+                return redirect('home')
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = AuthenticationForm()
+    return render(request, "login.html", {"form":form})
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, "You have successfully logged out.") 
+    return redirect('home')
