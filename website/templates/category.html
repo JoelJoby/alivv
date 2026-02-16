@@ -185,11 +185,17 @@
             <div class="col-lg-8">
                 <div class="subscribe_part_content">
                     <h2>Get promotions & updates!</h2>
-                    <p>Seamlessly empower fully researched growth strategies and interoperable internal or "organic"
-                        sources credibly innovate granular internal .</p>
+                    <h4 style="color: #fff; margin-bottom: 15px;">✨ From the Best of ALIV</h4>
+                    <p style="letter-spacing: 1px; font-weight: 300; margin-bottom: 30px;">Best Sellers
+                        &nbsp;&bull;&nbsp; Customer Favorites &nbsp;&bull;&nbsp; Top Rated Styles &nbsp;&bull;&nbsp;
+                        Most Reordered &nbsp;&bull;&nbsp; Viral Looks</p>
                     <div class="subscribe_form">
-                        <input type="email" placeholder="Enter your mail">
-                        <a href="#" class="btn_1">Subscribe</a>
+                        <form action="{% url 'subscribe' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="email" name="email" placeholder="Enter your mail" required>
+                            <button type="submit" class="btn_1"
+                                style="border: none; cursor: pointer;">Subscribe</button>
+                        </form>
                     </div>
                 </div>
             </div>
