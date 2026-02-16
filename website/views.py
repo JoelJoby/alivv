@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django import forms 
 
@@ -89,3 +91,110 @@ def category(request, cat):
     except Exception as e:
         messages.error(request, f"Error: {str(e)}")
         return redirect('home')
+
+def add_to_cart(request, pk):
+    if request.method == 'POST':
+        product = Product.objects.get(pk=pk)
+        quantity = int(request.POST.get('quantity', 1))
+        cart = request.session.get('cart', {})
+        
+        # Ensure cart keys are strings (JSON serialization)
+        pk_str = str(pk)
+        
+        if pk_str in cart:
+            cart[pk_str] += quantity
+        else:
+            cart[pk_str] = quantity
+            
+        request.session['cart'] = cart
+        messages.success(request, f"{product.name} added to cart successfully!")
+        return redirect('product', pk=pk)
+    else:
+        return redirect('product', pk=pk)
+
+def cart_detail(request):
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total_amount = 0
+    
+    # Get all product IDs from cart
+    product_ids = [int(k) for k in cart.keys()]
+    products = Product.objects.filter(id__in=product_ids)
+    
+    # Create a lookup dictionary for efficient access
+    product_map = {p.id: p for p in products}
+    
+    for pk_str, quantity in cart.items():
+        product = product_map.get(int(pk_str))
+        if product:
+            price = product.sale_price if product.is_sale else product.price
+            item_total = price * quantity
+            
+            cart_items.append({
+                'product': product,
+                'quantity': quantity,
+                'price': price,
+                'total_price': item_total
+            })
+            total_amount += item_total
+            
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total_amount': total_amount
+    })
+
+def remove_from_cart(request, pk):
+    cart = request.session.get('cart', {})
+    pk_str = str(pk)
+    
+    if pk_str in cart:
+        del cart[pk_str]
+        request.session['cart'] = cart
+        messages.success(request, "Item removed from cart.")
+    
+    return redirect('cart_detail')
+
+@require_POST
+def update_cart(request):
+    try:
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity'))
+        
+        cart = request.session.get('cart', {})
+        pk_str = str(product_id)
+        
+        if pk_str in cart:
+            if quantity > 0:
+                cart[pk_str] = quantity
+            else:
+                del cart[pk_str]
+            
+            request.session['cart'] = cart
+            
+            # Recalculate totals
+            total_amount = 0
+            item_total = 0
+            
+            product_ids = [int(k) for k in cart.keys()]
+            products = Product.objects.filter(id__in=product_ids)
+            product_map = {p.id: p for p in products}
+            
+            for k, v in cart.items():
+                p = product_map.get(int(k))
+                if p:
+                    price = p.sale_price if p.is_sale else p.price
+                    t = price * v
+                    total_amount += t
+                    if str(p.id) == pk_str:
+                        item_total = t
+            
+            return JsonResponse({
+                'success': True,
+                'item_total': item_total,
+                'total_amount': total_amount
+            })
+            
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'})

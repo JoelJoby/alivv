@@ -47,21 +47,9 @@
                             <p>Quantity</p>
                             <div class="product_count d-inline-block">
                                 <span class="product_count_item inumber-decrement"> <i class="ti-minus"></i></span>
-                                <input class="product_count_item input-number" type="text" value="1" min="0" max="10">
+                                <input class="product_count_item input-number" type="text" value="1" min="1" max="10">
                                 <span class="product_count_item number-increment"> <i class="ti-plus"></i></span>
                             </div>
-
-                            {% if product.sizes.exists %}
-                            <div class="product_size_selector mt-3">
-                                <p>Select Size</p>
-                                <select class="form-control" id="productSize">
-                                    {% for size_obj in product.sizes.all %}
-                                    <option value="{% firstof size_obj.code size_obj.name %}">{% firstof size_obj.code
-                                        size_obj.name %}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            {% endif %}
 
                             {% if product.is_sale %}
                             <strike class="mr-2">
@@ -73,8 +61,16 @@
                             {% endif %}
                         </div>
                         <div class="buy_now">
-                            <a href="#" class="btn_3" id="buyNowBtn">
-                                Buy Now
+                            <form action="{% url 'add_to_cart' product.id %}" method="POST" id="add_to_cart_form"
+                                style="display: inline-block;">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" id="hidden_quantity" value="1">
+                                <button type="submit" class="btn_3" style="border: none; cursor: pointer;">
+                                    Add to Cart
+                                </button>
+                            </form>
+                            <a href="{% url 'cart_detail' %}" class="btn_3" style="margin-left: 10px;">
+                                Go to Cart
                             </a>
                         </div>
                     </div>
@@ -92,9 +88,10 @@
             <div class="col-lg-8">
                 <div class="subscribe_part_content">
                     <h2>Get promotions & updates!</h2>
-                    <p>Seamlessly empower fully researched growth strategies and interoperable internal or “organic”
-                        sources
-                        credibly innovate granular internal .</p>
+                    <h4 style="color: #fff; margin-bottom: 15px;">✨ From the Best of ALIV</h4>
+                    <p style="letter-spacing: 1px; font-weight: 300; margin-bottom: 30px;">Best Sellers
+                        &nbsp;&bull;&nbsp; Customer Favorites &nbsp;&bull;&nbsp; Top Rated Styles &nbsp;&bull;&nbsp;
+                        Most Reordered &nbsp;&bull;&nbsp; Viral Looks</p>
                     <div class="subscribe_form">
                         <form action="{% url 'subscribe' %}" method="POST">
                             {% csrf_token %}
@@ -111,24 +108,16 @@
 <!-- subscribe part end -->
 
 <script>
-    document.getElementById("buyNowBtn").addEventListener("click", function (e) {
-        e.preventDefault();
+    // Sync quantity before submission
+    document.getElementById("add_to_cart_form").addEventListener("submit", function (e) {
         const quantity = document.querySelector('.input-number').value || 1;
-        const productName = "{{ product.name }}";
-        const productURL = "{{ request.build_absolute_uri }}";
+        document.getElementById('hidden_quantity').value = quantity;
+    });
 
-        // Get selected size if applicable
-        const sizeSelect = document.getElementById("productSize");
-        let sizeInfo = "";
-        if (sizeSelect) {
-            sizeInfo = ` Size: ${sizeSelect.value}.`;
-        }
-
-        const message = `Hello Admin, a user is interested in: ${productName}.${sizeInfo} Quantity: ${quantity}. View it here: ${productURL}`;
-        const encodedMessage = encodeURIComponent(message);
-        const whatsappNumber = "918078800396";
-        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-        window.open(whatsappLink, '_blank');
+    // Validating quantity input
+    document.querySelector('.input-number').addEventListener('change', function () {
+        if (this.value < 1) this.value = 1;
+        if (this.value > 10) this.value = 10;
     });
 </script>
 

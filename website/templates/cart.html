@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- breadcrumb part start-->
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>cart list</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- breadcrumb part end-->
+
+<!--================Cart Area =================-->
+<section class="cart_area section_padding">
+    <div class="container">
+        <div class="cart_inner">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <div class="media">
+                                    <div class="d-flex">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                            style="width: 150px; height: auto;" />
+                                    </div>
+                                    <div class="media-body">
+                                        <p>{{ item.product.description|truncatewords:10 }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <h5>Rs {{ item.price }}</h5>
+                            </td>
+                            <td>
+                                <div class="product_count">
+                                    <span class="input-number-decrement decrease-qty"
+                                        data-product-id="{{ item.product.id }}"> <i class="ti-minus"></i></span>
+                                    <input class="qty-input" type="text" value="{{ item.quantity }}" min="1" max="10"
+                                        data-product-id="{{ item.product.id }}">
+                                    <span class="input-number-increment increase-qty"
+                                        data-product-id="{{ item.product.id }}"> <i class="ti-plus"></i></span>
+                                </div>
+                            </td>
+                            <td>
+                                <h5 id="item-total-{{ item.product.id }}">Rs {{ item.total_price }}</h5>
+                            </td>
+                            <td>
+                                <a href="{% url 'remove_from_cart' item.product.id %}"
+                                    class="genric-btn danger-border circle small"><i class="ti-trash"></i></a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Your cart is empty.</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <h5>Subtotal</h5>
+                            </td>
+                            <td>
+                                <h5 id="cart-total">Rs {{ total_amount }}</h5>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="checkout_btn_inner float-right">
+                    <a class="btn_1" href="{% url 'product_list' %}">Continue Shopping</a>
+                    <a class="btn_1 checkout_btn_1" href="#">Proceed to checkout</a>
+                </div>
+            </div>
+        </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to update cart via AJAX
+        function updateCart(productId, quantity) {
+            fetch("{% url 'update_cart' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: new URLSearchParams({
+                    'product_id': productId,
+                    'quantity': quantity
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update item total
+                        const itemTotalElement = document.getElementById(`item-total-${productId}`);
+                        if (itemTotalElement) {
+                            itemTotalElement.textContent = `Rs ${data.item_total}`;
+                        }
+                        // Update cart total
+                        const cartTotalElement = document.getElementById('cart-total');
+                        if (cartTotalElement) {
+                            cartTotalElement.textContent = `Rs ${data.total_amount}`;
+                        }
+                    } else {
+                        console.error('Error updating cart:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Handle quantity input change
+        document.querySelectorAll('.qty-input').forEach(input => {
+            input.addEventListener('change', function () {
+                let quantity = parseInt(this.value);
+                if (isNaN(quantity) || quantity < 1) {
+                    quantity = 1;
+                    this.value = 1;
+                }
+                if (quantity > 10) {
+                    quantity = 10;
+                    this.value = 10;
+                }
+                const productId = this.getAttribute('data-product-id');
+                updateCart(productId, quantity);
+            });
+        });
+
+        // Handle increment button
+        document.querySelectorAll('.increase-qty').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+                let quantity = parseInt(input.value);
+                if (quantity < 10) {
+                    quantity++;
+                    input.value = quantity;
+                    updateCart(productId, quantity);
+                }
+            });
+        });
+
+        // Handle decrement button
+        document.querySelectorAll('.decrease-qty').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+                let quantity = parseInt(input.value);
+                if (quantity > 1) {
+                    quantity--;
+                    input.value = quantity;
+                    updateCart(productId, quantity);
+                }
+            });
+        });
+    });
+</script>
+<!--================End Cart Area =================-->
+{% endblock %}

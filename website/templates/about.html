@@ -46,8 +46,7 @@ This is the website for Traditional Wear
     </div>
 </section>
 
-<!-- product list part start-->
-<section class="about_us padding_top">
+<!-- <section class="about_us padding_top">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -67,10 +66,9 @@ This is the website for Traditional Wear
             </div>
         </div>
     </div>
-</section>
-<!-- product list part end-->
+</section> -->
 
-<section class="about_us padding_top">
+<!-- <section class="about_us padding_top">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -91,7 +89,7 @@ This is the website for Traditional Wear
             </div>
         </div>
     </div>
-</section>
+</section> -->
 
 <!-- feature part here -->
 <section class="feature_part section_padding">
@@ -111,12 +109,12 @@ This is the website for Traditional Wear
             </div>
         </div>
         <div class="row justify-content-center">
-            <div class="col-lg-3 col-sm-6">
+            <!-- <div class="col-lg-3 col-sm-6">
                 <div class="single_feature_part">
                     <img src="{% static 'website/img/icon/feature_icon_1.svg' %}" alt="#">
                     <h4>Credit Card Support</h4>
                 </div>
-            </div>
+            </div> -->
             <div class="col-lg-3 col-sm-6">
                 <div class="single_feature_part">
                     <img src="{% static 'website/img/icon/feature_icon_2.svg' %}" alt="#">
@@ -169,8 +167,10 @@ This is the website for Traditional Wear
             <div class="col-lg-8">
                 <div class="subscribe_part_content">
                     <h2>Get promotions & updates!</h2>
-                    <p>Seamlessly empower fully researched growth strategies and interoperable internal or "organic"
-                        sources credibly innovate granular internal .</p>
+                    <h4 style="color: #fff; margin-bottom: 15px;">✨ From the Best of ALIV</h4>
+                    <p style="letter-spacing: 1px; font-weight: 300; margin-bottom: 30px;">Best Sellers
+                        &nbsp;&bull;&nbsp; Customer Favorites &nbsp;&bull;&nbsp; Top Rated Styles &nbsp;&bull;&nbsp;
+                        Most Reordered &nbsp;&bull;&nbsp; Viral Looks</p>
                     <div class="subscribe_form">
                         <form action="{% url 'subscribe' %}" method="POST">
                             {% csrf_token %}
