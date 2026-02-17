@@ -42,7 +42,10 @@
                                             style="width: 150px; height: auto;" />
                                     </div>
                                     <div class="media-body">
-                                        <p>{{ item.product.description|truncatewords:10 }}</p>
+                                        <p>{{ item.product.name }}</p>
+                                        {% if item.size %}
+                                        <p>Size: {{ item.size }}</p>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </td>
@@ -51,19 +54,19 @@
                             </td>
                             <td>
                                 <div class="product_count">
-                                    <span class="input-number-decrement decrease-qty"
-                                        data-product-id="{{ item.product.id }}"> <i class="ti-minus"></i></span>
+                                    <span class="input-number-decrement decrease-qty" data-item-id="{{ item.item_id }}">
+                                        <i class="ti-minus"></i></span>
                                     <input class="qty-input" type="text" value="{{ item.quantity }}" min="1" max="10"
-                                        data-product-id="{{ item.product.id }}">
-                                    <span class="input-number-increment increase-qty"
-                                        data-product-id="{{ item.product.id }}"> <i class="ti-plus"></i></span>
+                                        data-item-id="{{ item.item_id }}">
+                                    <span class="input-number-increment increase-qty" data-item-id="{{ item.item_id }}">
+                                        <i class="ti-plus"></i></span>
                                 </div>
                             </td>
                             <td>
-                                <h5 id="item-total-{{ item.product.id }}">Rs {{ item.total_price }}</h5>
+                                <h5 id="item-total-{{ item.item_id }}">Rs {{ item.total_price }}</h5>
                             </td>
                             <td>
-                                <a href="{% url 'remove_from_cart' item.product.id %}"
+                                <a href="{% url 'remove_from_cart' item.item_id %}"
                                     class="genric-btn danger-border circle small"><i class="ti-trash"></i></a>
                             </td>
                         </tr>
@@ -86,7 +89,7 @@
                 </table>
                 <div class="checkout_btn_inner float-right">
                     <a class="btn_1" href="{% url 'product_list' %}">Continue Shopping</a>
-                    <a class="btn_1 checkout_btn_1" href="#">Proceed to checkout</a>
+                    <a class="btn_1 checkout_btn_1" href="{% url 'checkout' %}">Proceed to checkout</a>
                 </div>
             </div>
         </div>
@@ -95,7 +98,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Function to update cart via AJAX
-        function updateCart(productId, quantity) {
+        function updateCart(itemId, quantity) {
             fetch("{% url 'update_cart' %}", {
                 method: 'POST',
                 headers: {
@@ -103,7 +106,7 @@
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 body: new URLSearchParams({
-                    'product_id': productId,
+                    'item_id': itemId,
                     'quantity': quantity
                 })
             })
@@ -111,7 +114,9 @@
                 .then(data => {
                     if (data.success) {
                         // Update item total
-                        const itemTotalElement = document.getElementById(`item-total-${productId}`);
+                        // Escape the id for valid selector if it contains special chars (which it shouldn't, but safe practice)
+                        // Actually, plain ID is fine as long as we use specific attribute or ID
+                        const itemTotalElement = document.getElementById(`item-total-${itemId}`);
                         if (itemTotalElement) {
                             itemTotalElement.textContent = `Rs ${data.item_total}`;
                         }
@@ -139,21 +144,21 @@
                     quantity = 10;
                     this.value = 10;
                 }
-                const productId = this.getAttribute('data-product-id');
-                updateCart(productId, quantity);
+                const itemId = this.getAttribute('data-item-id');
+                updateCart(itemId, quantity);
             });
         });
 
         // Handle increment button
         document.querySelectorAll('.increase-qty').forEach(btn => {
             btn.addEventListener('click', function () {
-                const productId = this.getAttribute('data-product-id');
-                const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+                const itemId = this.getAttribute('data-item-id');
+                const input = document.querySelector(`.qty-input[data-item-id="${itemId}"]`);
                 let quantity = parseInt(input.value);
                 if (quantity < 10) {
                     quantity++;
                     input.value = quantity;
-                    updateCart(productId, quantity);
+                    updateCart(itemId, quantity);
                 }
             });
         });
@@ -161,13 +166,13 @@
         // Handle decrement button
         document.querySelectorAll('.decrease-qty').forEach(btn => {
             btn.addEventListener('click', function () {
-                const productId = this.getAttribute('data-product-id');
-                const input = document.querySelector(`.qty-input[data-product-id="${productId}"]`);
+                const itemId = this.getAttribute('data-item-id');
+                const input = document.querySelector(`.qty-input[data-item-id="${itemId}"]`);
                 let quantity = parseInt(input.value);
                 if (quantity > 1) {
                     quantity--;
                     input.value = quantity;
-                    updateCart(productId, quantity);
+                    updateCart(itemId, quantity);
                 }
             });
         });

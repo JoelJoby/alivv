@@ -3,6 +3,41 @@
 
 {% block content%}
 
+<style>
+    .size-option {
+        width: 50px;
+        height: 40px;
+        border: 1px solid #B08EAD;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: 500;
+        color: #555;
+        transition: all 0.2s ease;
+    }
+
+    .size-option:hover {
+        border-color: #B08EAD;
+    }
+
+    .size-option.selected {
+        border-color: #B08EAD;
+        background-color: #B08EAD;
+        color: #fff;
+    }
+
+    .size-option.disabled {
+        border: 1px dashed #ccc;
+        background-color: #f8f9fa;
+        color: #adb5bd;
+        text-decoration: line-through;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+</style>
+
 <!-- breadcrumb part start-->
 <section class="breadcrumb_part single_product_breadcrumb">
     <div class="container">
@@ -60,11 +95,28 @@
                             <p>Rs {{ product.price}}</p>
                             {% endif %}
                         </div>
+                        <div class="product_size_selector mb-4 mt-3"
+                            style="text-align: left; max-width: 320px; margin-left: auto; margin-right: auto;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span style="color: #B08EAD; font-size: 16px;">Select Size</span>
+                            </div>
+                            <div class="d-flex justify-content-between" id="size-options-container">
+                                {% for size in all_sizes %}
+                                {% if size in product.sizes.all %}
+                                <div class="size-option" data-value="{{ size.code }}">{{ size.code }}</div>
+                                {% else %}
+                                <div class="size-option disabled" data-value="{{ size.code }}">{{ size.code }}</div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="selected_size_validation" required>
+                        </div>
                         <div class="buy_now">
                             <form action="{% url 'add_to_cart' product.id %}" method="POST" id="add_to_cart_form"
                                 style="display: inline-block;">
                                 {% csrf_token %}
                                 <input type="hidden" name="quantity" id="hidden_quantity" value="1">
+                                <input type="hidden" name="size" id="hidden_size" value="">
                                 <button type="submit" class="btn_3" style="border: none; cursor: pointer;">
                                     Add to Cart
                                 </button>
@@ -119,6 +171,26 @@
         if (this.value < 1) this.value = 1;
         if (this.value > 10) this.value = 10;
     });
+
+    // Size selection
+    const sizeOptions = document.querySelectorAll('.size-option:not(.disabled)');
+    const hiddenSizeInput = document.getElementById('hidden_size');
+
+    sizeOptions.forEach(option => {
+        option.addEventListener('click', function () {
+            // Remove selected class from all
+            sizeOptions.forEach(opt => opt.classList.remove('selected'));
+            // Add to clicked
+            this.classList.add('selected');
+            // Update hidden input
+            if (hiddenSizeInput) hiddenSizeInput.value = this.dataset.value;
+        });
+    });
+
+    // Select first size by default
+    if (sizeOptions.length > 0) {
+        sizeOptions[0].click();
+    }
 </script>
 
 
