@@ -8,7 +8,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth.models import User
-from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State
 
 def subscribe(request):
     if request.method == 'POST':
@@ -429,8 +429,15 @@ def customer_details(request):
             messages.error(request, "Please fill all required fields.")
 
     details = CustomerDetails.objects.filter(customer=customer)
+    countries = Country.objects.all().order_by('name')
     
     return render(request, 'customer_details.html', {
         'customer': customer,
-        'details': details
+        'details': details,
+        'countries': countries
     })
+def get_states(request):
+    country_id = request.GET.get('country_id')
+    states = State.objects.filter(country_id=country_id).order_by('name')
+    data = list(states.values('id', 'name'))
+    return JsonResponse(data, safe=False)

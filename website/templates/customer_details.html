@@ -2,6 +2,37 @@
 {% load static %}
 {% block title %}Account Details - Alivv{% endblock %}
 
+{% block scripts %}
+<script>
+    function handleCountryChange(selectElement) {
+        const countryName = selectElement.options[selectElement.selectedIndex].text;
+        document.getElementById('country-name-hidden').value = countryName;
+        fetchStates(selectElement.value);
+    }
+
+    function fetchStates(countryId) {
+        const stateSelect = document.getElementById('state-select');
+        stateSelect.innerHTML = '<option value="" selected disabled>Loading...</option>';
+
+        fetch(`/get_states/?country_id=${countryId}`)
+            .then(response => response.json())
+            .then(data => {
+                stateSelect.innerHTML = '<option value="" selected disabled>Select State</option>';
+                data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.name; // Save state name
+                    option.textContent = state.name;
+                    stateSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching states:', error);
+                stateSelect.innerHTML = '<option value="" selected disabled>Error loading states</option>';
+            });
+    }
+</script>
+{% endblock %}
+
 {% block content %}
 <section class="breadcrumb_part">
     <div class="container">
@@ -26,12 +57,15 @@
                         {% csrf_token %}
                         <div class="col-md-12 form-group p_star">
                             <!-- Using standard select for simplicity if nice-select is not configured perfectly -->
-                            <select class="form-control" name="country">
-                                <option value="" selected disabled>Country</option>
-                                <option value="Bangladesh">Bangladesh</option>
-                                <option value="India">India</option>
-                                <option value="Pakistan">Pakistan</option>
+                            <!-- Dynamic Country Select -->
+                            <select class="form-control" name="country_id" id="country-select"
+                                onchange="handleCountryChange(this)">
+                                <option value="" selected disabled>Select Country</option>
+                                {% for country in countries %}
+                                <option value="{{ country.id }}">{{ country.name }}</option>
+                                {% endfor %}
                             </select>
+                            <input type="hidden" name="country" id="country-name-hidden">
                         </div>
                         <div class="col-md-12 form-group p_star">
                             <input type="text" class="form-control" id="add1" name="address_line_01"
@@ -46,11 +80,8 @@
                                 required />
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <select class="form-control" name="district">
-                                <option value="" selected disabled>District</option>
-                                <option value="District 1">District 1</option>
-                                <option value="District 2">District 2</option>
-                                <option value="District 3">District 3</option>
+                            <select class="form-control" name="district" id="state-select">
+                                <option value="" selected disabled>Select State</option>
                             </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
