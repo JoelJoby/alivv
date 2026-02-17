@@ -2,6 +2,11 @@
 {% load static %}
 
 {% block scripts %}
+<style>
+    .p_star input:not(:placeholder-shown)+.placeholder {
+        display: none;
+    }
+</style>
 <script>
     function handleCountryChange(selectElement) {
         fetchStates(selectElement.value);
@@ -44,6 +49,7 @@
         if (document.getElementById('add2')) document.getElementById('add2').value = selectedOption.dataset.add2;
         if (document.getElementById('city')) document.getElementById('city').value = selectedOption.dataset.city;
         if (document.getElementById('zip')) document.getElementById('zip').value = selectedOption.dataset.zip;
+        if (document.getElementById('message')) document.getElementById('message').value = selectedOption.dataset.notes || '';
 
         const countryId = selectedOption.dataset.country;
         const stateId = selectedOption.dataset.state;
@@ -92,11 +98,12 @@
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'checkout' %}">
                 <div class="col-md-6 form-group p_star">
-                    <input type="text" class="form-control" id="name" name="username" value="" />
+                    <input type="text" class="form-control" id="name" name="username" value="" placeholder=" " />
                     <span class="placeholder" data-placeholder="Username or Email"></span>
                 </div>
                 <div class="col-md-6 form-group p_star">
-                    <input type="password" class="form-control" id="password" name="password" value="" />
+                    <input type="password" class="form-control" id="password" name="password" value=""
+                        placeholder=" " />
                     <span class="placeholder" data-placeholder="Password"></span>
                 </div>
                 <div class="col-md-12 form-group">
@@ -137,7 +144,8 @@
                                 data-phone="{{ address.customer.phone }}" data-add1="{{ address.address_line_1 }}"
                                 data-add2="{{ address.address_line_2|default:'' }}" data-city="{{ address.city }}"
                                 data-zip="{{ address.postcode }}" data-country="{{ address.country_id }}"
-                                data-state="{{ address.state_id|default:'' }}">
+                                data-state="{{ address.state_id|default:'' }}"
+                                data-notes="{{ address.order_notes|default:'' }}">
                                 {{ address.address_line_1 }} - {{ address.city }}
                             </option>
                             {% endfor %}
@@ -147,11 +155,11 @@
                     <form class="row contact_form" action="#" method="post" novalidate="novalidate">
                         {% csrf_token %}
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="first" name="name" />
+                            <input type="text" class="form-control" id="first" name="name" placeholder=" " />
                             <span class="placeholder" data-placeholder="First name"></span>
                         </div>
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="last" name="name" />
+                            <input type="text" class="form-control" id="last" name="name" placeholder=" " />
                             <span class="placeholder" data-placeholder="Last name"></span>
                         </div>
                         <!-- <div class="col-md-12 form-group">
@@ -159,11 +167,11 @@
                                 placeholder="Company name" />
                         </div> -->
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="number" name="number" />
+                            <input type="text" class="form-control" id="number" name="number" placeholder=" " />
                             <span class="placeholder" data-placeholder="Phone number"></span>
                         </div>
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="email" name="compemailany" />
+                            <input type="text" class="form-control" id="email" name="compemailany" placeholder=" " />
                             <span class="placeholder" data-placeholder="Email Address"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
@@ -183,15 +191,15 @@
                             </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <input type="text" class="form-control" id="add1" name="add1" />
+                            <input type="text" class="form-control" id="add1" name="add1" placeholder=" " />
                             <span class="placeholder" data-placeholder="Address line 01"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <input type="text" class="form-control" id="add2" name="add2" />
+                            <input type="text" class="form-control" id="add2" name="add2" placeholder=" " />
                             <span class="placeholder" data-placeholder="Address line 02"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <input type="text" class="form-control" id="city" name="city" />
+                            <input type="text" class="form-control" id="city" name="city" placeholder=" " />
                             <span class="placeholder" data-placeholder="Town/City"></span>
                         </div>
                         <div class="col-md-12 form-group">
