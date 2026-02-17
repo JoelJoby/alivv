@@ -404,26 +404,53 @@ def customer_details(request):
         return redirect('home')
 
     if request.method == 'POST':
-        country = request.POST.get('country')
+        country_id = request.POST.get('country')
         address_line_1 = request.POST.get('address_line_01')
         address_line_2 = request.POST.get('address_line_02')
         city = request.POST.get('town_city')
-        district = request.POST.get('district')
+        state_id = request.POST.get('state')
         postcode = request.POST.get('postcode_zip')
         order_notes = request.POST.get('order_notes')
 
-        if country and address_line_1 and city and postcode:
-            CustomerDetails.objects.create(
-                customer=customer,
-                country=country,
-                address_line_1=address_line_1,
-                address_line_2=address_line_2,
-                city=city,
-                district=district,
-                postcode=postcode,
-                order_notes=order_notes
-            )
-            messages.success(request, "Address details added successfully.")
+        if country_id and address_line_1 and city and postcode:
+            # Get Country and State instances
+            country_inst = None
+            if country_id:
+                country_inst = Country.objects.filter(id=country_id).first()
+            
+            state_inst = None
+            if state_id:
+                state_inst = State.objects.filter(id=state_id).first()
+
+            # Check if this is an update
+            address_id = request.POST.get('address_id')
+            if address_id:
+                try:
+                    address = CustomerDetails.objects.get(id=address_id, customer=customer)
+                    address.country = country_inst
+                    address.address_line_1 = address_line_1
+                    address.address_line_2 = address_line_2
+                    address.city = city
+                    address.state = state_inst
+                    address.postcode = postcode
+                    address.order_notes = order_notes
+                    address.save()
+                    messages.success(request, "Address details updated successfully.")
+                except CustomerDetails.DoesNotExist:
+                     messages.error(request, "Address not found.")
+            else:
+                CustomerDetails.objects.create(
+                    customer=customer,
+                    country=country_inst,
+                    address_line_1=address_line_1,
+                    address_line_2=address_line_2,
+                    city=city,
+                    state=state_inst,
+                    postcode=postcode,
+                    order_notes=order_notes
+                )
+                messages.success(request, "Address details added successfully.")
+            
             return redirect('customer_details')
         else:
             messages.error(request, "Please fill all required fields.")
@@ -436,6 +463,42 @@ def customer_details(request):
         'details': details,
         'countries': countries
     })
+
+@login_required
+def edit_address(request, pk):
+    try:
+        address = CustomerDetails.objects.get(id=pk, customer__email=request.user.email)
+        # Fetch customer again as needed for context
+        customer = Customer.objects.get(email=request.user.email)
+        details = CustomerDetails.objects.filter(customer=customer)
+        countries = Country.objects.all().order_by('name')
+        
+        # Determine states for the selected country to populate dropdown
+        states = []
+        if address.country:
+             states = State.objects.filter(country=address.country).order_by('name')
+
+        return render(request, 'customer_details.html', {
+            'customer': customer,
+            'details': details,
+            'countries': countries,
+            'editing_address': address,
+            'states': states
+        })
+    except (CustomerDetails.DoesNotExist, Customer.DoesNotExist):
+        messages.error(request, "Address or customer not found.")
+        return redirect('customer_details')
+
+@login_required
+def delete_address(request, pk):
+    try:
+        address = CustomerDetails.objects.get(id=pk, customer__email=request.user.email)
+        address.delete()
+        messages.success(request, "Address deleted successfully.")
+    except CustomerDetails.DoesNotExist:
+        messages.error(request, "Address not found.")
+    
+    return redirect('customer_details')
 def get_states(request):
     country_id = request.GET.get('country_id')
     if not country_id:

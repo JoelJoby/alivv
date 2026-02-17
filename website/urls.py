@@ -20,4 +20,6 @@ urlpatterns = [
     path('create_account/', views.create_account, name='create_account'),
     path('customer_details/', views.customer_details, name='customer_details'),
     path('get_states/', views.get_states, name='get_states'),
+    path('customer_details/edit/<int:pk>/', views.edit_address, name='edit_address'),
+    path('customer_details/delete/<int:pk>/', views.delete_address, name='delete_address'),
 ]

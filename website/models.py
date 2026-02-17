@@ -120,9 +120,9 @@ class CustomerDetails(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     address_line_1 = models.CharField(max_length=255)
     address_line_2 = models.CharField(max_length=255, blank=True, null=True)
-    country = models.CharField(max_length=100)
+    country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
+    state = models.ForeignKey('State', on_delete=models.SET_NULL, null=True)
     city = models.CharField(max_length=100)
-    district = models.CharField(max_length=100)
     postcode = models.CharField(max_length=20)
     order_notes = models.TextField(blank=True, null=True)
 

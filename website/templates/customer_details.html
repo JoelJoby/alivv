@@ -5,8 +5,7 @@
 {% block scripts %}
 <script>
     function handleCountryChange(selectElement) {
-        const countryName = selectElement.options[selectElement.selectedIndex].text;
-        document.getElementById('country-name-hidden').value = countryName;
+        // Just fetch states, no need to set hidden input
         fetchStates(selectElement.value);
     }
 
@@ -20,7 +19,7 @@
                 stateSelect.innerHTML = '<option value="" selected disabled>Select State</option>';
                 data.forEach(state => {
                     const option = document.createElement('option');
-                    option.value = state.name; // Save state name
+                    option.value = state.id; // Save state ID
                     option.textContent = state.name;
                     stateSelect.appendChild(option);
                 });
@@ -58,14 +57,18 @@
                         <div class="col-md-12 form-group p_star">
                             <!-- Using standard select for simplicity if nice-select is not configured perfectly -->
                             <!-- Dynamic Country Select -->
-                            <select class="form-control" name="country_id" id="country-select"
+                            <select class="form-control" name="country" id="country-select"
                                 onchange="handleCountryChange(this)">
                                 <option value="" selected disabled>Select Country</option>
                                 {% for country in countries %}
                                 <option value="{{ country.id }}">{{ country.name }}</option>
                                 {% endfor %}
                             </select>
-                            <input type="hidden" name="country" id="country-name-hidden">
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <select class="form-control" name="state" id="state-select">
+                                <option value="" selected disabled>Select State</option>
+                            </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
                             <input type="text" class="form-control" id="add1" name="address_line_01"
@@ -78,11 +81,6 @@
                         <div class="col-md-12 form-group p_star">
                             <input type="text" class="form-control" id="city" name="town_city" placeholder="Town/City *"
                                 required />
-                        </div>
-                        <div class="col-md-12 form-group p_star">
-                            <select class="form-control" name="district" id="state-select">
-                                <option value="" selected disabled>Select State</option>
-                            </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
                             <input type="text" class="form-control" id="zip" name="postcode_zip"
@@ -108,8 +106,8 @@
                                 <strong>Address {{ forloop.counter }}</strong><br>
                                 {{ detail.address_line_1 }}<br>
                                 {% if detail.address_line_2 %}{{ detail.address_line_2 }}<br>{% endif %}
-                                {{ detail.city }}, {{ detail.district }}<br>
-                                {{ detail.country }} - {{ detail.postcode }}
+                                {{ detail.city }}, {{ detail.state.name }}<br>
+                                {{ detail.country.name }} - {{ detail.postcode }}
                             </p>
                         </div>
                         <hr>
