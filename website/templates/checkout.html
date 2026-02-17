@@ -19,11 +19,12 @@
 <!--================Checkout Area =================-->
 <section class="checkout_area section_padding">
     <div class="container">
+        {% if not user.is_authenticated %}
         <div class="returning_customer">
             <div class="check_title">
                 <h2>
                     Returning Customer?
-                    <a href="#">Click here to login</a>
+                    <a href="{% url 'login' %}">Click here to login</a>
                 </h2>
             </div>
             <p>
@@ -31,10 +32,11 @@
                 boxes below. If you are a new customer, please proceed to the
                 Billing & Shipping section.
             </p>
-            <form class="row contact_form" action="#" method="post" novalidate="novalidate">
+            <form class="row contact_form" action="{% url 'login' %}" method="post" novalidate="novalidate">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'checkout' %}">
                 <div class="col-md-6 form-group p_star">
-                    <input type="text" class="form-control" id="name" name="name" value=" " />
+                    <input type="text" class="form-control" id="name" name="username" value="" />
                     <span class="placeholder" data-placeholder="Username or Email"></span>
                 </div>
                 <div class="col-md-6 form-group p_star">
@@ -53,6 +55,7 @@
                 </div>
             </form>
         </div>
+        {% endif %}
         <!-- <div class="cupon_area">
             <div class="check_title">
                 <h2>

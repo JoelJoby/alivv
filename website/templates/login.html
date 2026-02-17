@@ -38,6 +38,9 @@
                             Please Sign in now</h3>
                         <form class="row contact_form" action="{% url 'login' %}" method="post" novalidate="novalidate">
                             {% csrf_token %}
+                            {% if next %}
+                            <input type="hidden" name="next" value="{{ next }}">
+                            {% endif %}
 
                             {% if form.errors %}
                             <div class="col-md-12 alert alert-danger">

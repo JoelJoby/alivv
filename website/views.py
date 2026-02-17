@@ -316,6 +316,8 @@ def checkout(request):
     })
 
 def login_view(request):
+    next_url = request.POST.get('next') or request.GET.get('next')
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -325,6 +327,8 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"You are now logged in as {username}.")
+                if next_url:
+                    return redirect(next_url)
                 return redirect('home')
             else:
                 messages.error(request, "Invalid username or password.")
@@ -332,7 +336,12 @@ def login_view(request):
             messages.error(request, "Invalid username or password.")
     else:
         form = AuthenticationForm()
-    return render(request, "login.html", {"form":form})
+    
+    context = {"form": form}
+    if next_url:
+        context['next'] = next_url
+        
+    return render(request, "login.html", context)
 
 def logout_view(request):
     logout(request)
