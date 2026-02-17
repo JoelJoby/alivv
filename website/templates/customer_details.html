@@ -14,7 +14,7 @@
         const stateSelect = document.getElementById('state-select');
         stateSelect.innerHTML = '<option value="" selected disabled>Loading...</option>';
 
-        fetch(`/get_states/?country_id=${countryId}`)
+        fetch(`{% url 'get_states' %}?country_id=${countryId}`)
             .then(response => response.json())
             .then(data => {
                 stateSelect.innerHTML = '<option value="" selected disabled>Select State</option>';

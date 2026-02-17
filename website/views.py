@@ -438,6 +438,9 @@ def customer_details(request):
     })
 def get_states(request):
     country_id = request.GET.get('country_id')
+    if not country_id:
+        return JsonResponse([], safe=False)
+    
     states = State.objects.filter(country_id=country_id).order_by('name')
     data = list(states.values('id', 'name'))
     return JsonResponse(data, safe=False)
