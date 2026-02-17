@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django import forms 
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth.models import User
-from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State
 
 def subscribe(request):
     if request.method == 'POST':
@@ -310,9 +311,21 @@ def checkout(request):
             })
             total_amount += item_total
             
+    countries = Country.objects.all().order_by('name')
+    
+    user_addresses = []
+    if request.user.is_authenticated:
+        try:
+            customer = Customer.objects.get(email=request.user.email)
+            user_addresses = CustomerDetails.objects.filter(customer=customer)
+        except Customer.DoesNotExist:
+            pass
+
     return render(request, 'checkout.html', {
         'cart_items': cart_items,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'countries': countries,
+        'user_addresses': user_addresses
     })
 
 def login_view(request):
@@ -392,3 +405,117 @@ def create_account(request):
             return redirect('create_account')
         
     return render(request, 'create_account.html')
+
+@login_required
+def customer_details(request):
+    # Retrieve customer based on logged-in user's email
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+    except Customer.DoesNotExist:
+        messages.error(request, "Customer account not found.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        country_id = request.POST.get('country')
+        address_line_1 = request.POST.get('address_line_01')
+        address_line_2 = request.POST.get('address_line_02')
+        city = request.POST.get('town_city')
+        state_id = request.POST.get('state')
+        postcode = request.POST.get('postcode_zip')
+        order_notes = request.POST.get('order_notes')
+
+        if country_id and address_line_1 and city and postcode:
+            # Get Country and State instances
+            country_inst = None
+            if country_id:
+                country_inst = Country.objects.filter(id=country_id).first()
+            
+            state_inst = None
+            if state_id:
+                state_inst = State.objects.filter(id=state_id).first()
+
+            # Check if this is an update
+            address_id = request.POST.get('address_id')
+            if address_id:
+                try:
+                    address = CustomerDetails.objects.get(id=address_id, customer=customer)
+                    address.country = country_inst
+                    address.address_line_1 = address_line_1
+                    address.address_line_2 = address_line_2
+                    address.city = city
+                    address.state = state_inst
+                    address.postcode = postcode
+                    address.order_notes = order_notes
+                    address.save()
+                    messages.success(request, "Address details updated successfully.")
+                except CustomerDetails.DoesNotExist:
+                     messages.error(request, "Address not found.")
+            else:
+                CustomerDetails.objects.create(
+                    customer=customer,
+                    country=country_inst,
+                    address_line_1=address_line_1,
+                    address_line_2=address_line_2,
+                    city=city,
+                    state=state_inst,
+                    postcode=postcode,
+                    order_notes=order_notes
+                )
+                messages.success(request, "Address details added successfully.")
+            
+            return redirect('customer_details')
+        else:
+            messages.error(request, "Please fill all required fields.")
+
+    details = CustomerDetails.objects.filter(customer=customer)
+    countries = Country.objects.all().order_by('name')
+    
+    return render(request, 'customer_details.html', {
+        'customer': customer,
+        'details': details,
+        'countries': countries
+    })
+
+@login_required
+def edit_address(request, pk):
+    try:
+        address = CustomerDetails.objects.get(id=pk, customer__email=request.user.email)
+        # Fetch customer again as needed for context
+        customer = Customer.objects.get(email=request.user.email)
+        details = CustomerDetails.objects.filter(customer=customer)
+        countries = Country.objects.all().order_by('name')
+        
+        # Determine states for the selected country to populate dropdown
+        states = []
+        if address.country:
+             states = State.objects.filter(country=address.country).order_by('name')
+
+        return render(request, 'customer_details.html', {
+            'customer': customer,
+            'details': details,
+            'countries': countries,
+            'editing_address': address,
+            'states': states
+        })
+    except (CustomerDetails.DoesNotExist, Customer.DoesNotExist):
+        messages.error(request, "Address or customer not found.")
+        return redirect('customer_details')
+
+@login_required
+def delete_address(request, pk):
+    try:
+        address = CustomerDetails.objects.get(id=pk, customer__email=request.user.email)
+        address.delete()
+        messages.success(request, "Address deleted successfully.")
+    except CustomerDetails.DoesNotExist:
+        messages.error(request, "Address not found.")
+    
+    return redirect('customer_details')
+def get_states(request):
+    country_id = request.GET.get('country_id')
+    if not country_id:
+        return JsonResponse([], safe=False)
+    
+    states = State.objects.filter(country_id=country_id).order_by('name')
+    data = list(states.values('id', 'name'))
+    return JsonResponse(data, safe=False)
