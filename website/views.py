@@ -6,7 +6,8 @@ from django import forms
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Product,Category,Testimonial,Season,Subscriber,Size
+from django.contrib.auth.models import User
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer
 
 def subscribe(request):
     if request.method == 'POST':
@@ -337,3 +338,48 @@ def logout_view(request):
     logout(request)
     messages.info(request, "You have successfully logged out.") 
     return redirect('home')
+
+def create_account(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if not email:
+            messages.error(request, "Email is required.")
+            return redirect('create_account')
+            
+        if password != confirm_password:
+             messages.error(request, "Passwords do not match.")
+             return redirect('create_account')
+
+        if User.objects.filter(username=email).exists():
+             messages.error(request, "User with this email already exists.")
+             return redirect('create_account')
+        
+        # Create User
+        try:
+            user = User.objects.create_user(username=email, email=email, password=password, first_name=first_name, last_name=last_name)
+            user.save()
+            
+            # Create Customer
+            customer = Customer.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                phone=phone,
+                email=email,
+                password=password
+            )
+            customer.save()
+            
+            messages.success(request, "Account created successfully. Please login.")
+            return redirect('login')
+            
+        except Exception as e:
+            messages.error(request, f"Error creating account: {str(e)}")
+            return redirect('create_account')
+        
+    return render(request, 'create_account.html')

@@ -37,6 +37,7 @@
                             Please Sign up now</h3>
                         <form class="row contact_form" action="{% url 'create_account' %}" method="post"
                             novalidate="novalidate">
+                            {% csrf_token %}
 
                             <div class="col-md-12 form-group p_star">
                                 <input type="text" class="form-control" id="name" name="first_name"
