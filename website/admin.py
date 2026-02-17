@@ -10,6 +10,8 @@ from .models import (
     Size,
     Subscriber,
     CustomerDetails,
+    Country,
+    State,
 )
 
 # Register models only once
@@ -22,6 +24,8 @@ admin.site.register(Testimonial)
 admin.site.register(Season)
 admin.site.register(Size)
 admin.site.register(Subscriber)
+admin.site.register(Country)
+admin.site.register(State)
 
 class ProductAdmin(admin.ModelAdmin):
     filter_horizontal = ('sizes',)

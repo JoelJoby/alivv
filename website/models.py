@@ -147,3 +147,18 @@ class Subscriber(models.Model):
 
     def __str__(self):
         return self.email
+
+class Country(models.Model):
+    name = models.CharField(max_length=100)
+    iso_alpha_2 = models.CharField(max_length=2)
+    iso_alpha_3 = models.CharField(max_length=3)
+
+    def __str__(self):
+        return self.name
+
+class State(models.Model):
+    name = models.CharField(max_length=100)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='states')
+
+    def __str__(self):
+        return self.name
