@@ -8,7 +8,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth.models import User
-from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State, Order
 
 def subscribe(request):
     if request.method == 'POST':
@@ -270,6 +270,95 @@ def change_item_size(request):
     return redirect('cart_detail')
 
 def checkout(request):
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, "Please login to place an order.")
+            return redirect('login')
+            
+        try:
+            customer = Customer.objects.get(email=request.user.email)
+        except Customer.DoesNotExist:
+            messages.error(request, "Customer account not found.")
+            return redirect('home')
+
+        # Address Logic
+        selected_address_id = request.POST.get('selected_address_id')
+        address = None
+        
+        if selected_address_id:
+            try:
+                address = CustomerDetails.objects.get(id=selected_address_id, customer=customer)
+            except CustomerDetails.DoesNotExist:
+                 messages.error(request, "Selected address not found.")
+                 return redirect('checkout')
+        else:
+            # Create New Address
+            country_id = request.POST.get('country')
+            state_id = request.POST.get('state')
+            address_line_1 = request.POST.get('address_line_1')
+            city = request.POST.get('city')
+            postcode = request.POST.get('postcode')
+            
+            if not (country_id and address_line_1 and city and postcode):
+                 messages.error(request, "Please fill all required address fields.")
+                 return redirect('checkout')
+                 
+            country_inst = Country.objects.filter(id=country_id).first()
+            state_inst = State.objects.filter(id=state_id).first() if state_id else None
+            
+            address = CustomerDetails.objects.create(
+                customer=customer,
+                address_line_1=address_line_1,
+                address_line_2=request.POST.get('address_line_2', ''),
+                city=city,
+                state=state_inst,
+                country=country_inst,
+                postcode=postcode,
+                order_notes=request.POST.get('order_notes', '')
+            )
+            
+        # Process Cart
+        cart = request.session.get('cart', {})
+        if not cart:
+             messages.error(request, "Your cart is empty.")
+             return redirect('product_list')
+
+        # Get Products
+        product_ids = set()
+        for key in cart.keys():
+            pid = key.split('-')[0]
+            if pid.isdigit():
+                product_ids.add(int(pid))
+        
+        products = Product.objects.filter(id__in=product_ids)
+        product_map = {p.id: p for p in products}
+        
+        for item_id, quantity in cart.items():
+             parts = item_id.split('-')
+             # Skip invalid keys
+             if not parts[0].isdigit():
+                 continue
+                 
+             p_id = int(parts[0])
+             size = parts[1] if len(parts) > 1 else ''
+             
+             product = product_map.get(p_id)
+             if product:
+                 Order.objects.create(
+                     product=product,
+                     customer=customer,
+                     quantity=quantity,
+                     address=address,
+                     phone=request.POST.get('phone', ''),
+                     size=size,
+                     status=False
+                 )
+        
+        # Clear Cart
+        request.session['cart'] = {}
+        messages.success(request, "Order placed successfully!")
+        return redirect('home')
+        
     cart = request.session.get('cart', {})
     cart_items = []
     total_amount = 0
