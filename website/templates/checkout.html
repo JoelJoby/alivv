@@ -38,6 +38,11 @@
 
     function fillAddress(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+        // Clear or set hidden ID
+        const hiddenId = document.getElementById('selected_address_id');
+        if (hiddenId) hiddenId.value = selectedOption.value || '';
+
         if (!selectedOption.value) return;
 
         // Populate fields
@@ -152,14 +157,16 @@
                         </select>
                     </div>
                     {% endif %}
-                    <form class="row contact_form" action="#" method="post" novalidate="novalidate">
+                    <form class="row contact_form" action="{% url 'checkout' %}" method="post" novalidate="novalidate"
+                        id="billing-form">
                         {% csrf_token %}
+                        <input type="hidden" name="selected_address_id" id="selected_address_id" value="">
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="first" name="name" placeholder=" " />
+                            <input type="text" class="form-control" id="first" name="first_name" placeholder=" " />
                             <span class="placeholder" data-placeholder="First name"></span>
                         </div>
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="last" name="name" placeholder=" " />
+                            <input type="text" class="form-control" id="last" name="last_name" placeholder=" " />
                             <span class="placeholder" data-placeholder="Last name"></span>
                         </div>
                         <!-- <div class="col-md-12 form-group">
@@ -167,11 +174,11 @@
                                 placeholder="Company name" />
                         </div> -->
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="number" name="number" placeholder=" " />
+                            <input type="text" class="form-control" id="number" name="phone" placeholder=" " />
                             <span class="placeholder" data-placeholder="Phone number"></span>
                         </div>
                         <div class="col-md-6 form-group p_star">
-                            <input type="text" class="form-control" id="email" name="compemailany" placeholder=" " />
+                            <input type="text" class="form-control" id="email" name="email" placeholder=" " />
                             <span class="placeholder" data-placeholder="Email Address"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
@@ -191,11 +198,11 @@
                             </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <input type="text" class="form-control" id="add1" name="add1" placeholder=" " />
+                            <input type="text" class="form-control" id="add1" name="address_line_1" placeholder=" " />
                             <span class="placeholder" data-placeholder="Address line 01"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <input type="text" class="form-control" id="add2" name="add2" placeholder=" " />
+                            <input type="text" class="form-control" id="add2" name="address_line_2" placeholder=" " />
                             <span class="placeholder" data-placeholder="Address line 02"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
@@ -203,7 +210,8 @@
                             <span class="placeholder" data-placeholder="Town/City"></span>
                         </div>
                         <div class="col-md-12 form-group">
-                            <input type="text" class="form-control" id="zip" name="zip" placeholder="Postcode/ZIP" />
+                            <input type="text" class="form-control" id="zip" name="postcode"
+                                placeholder="Postcode/ZIP" />
                         </div>
                         <!-- <div class="col-md-12 form-group">
                             <div class="creat_account">
@@ -217,7 +225,7 @@
                                 <input type="checkbox" id="f-option3" name="selector" />
                                 <label for="f-option3">Ship to a different address?</label>
                             </div> -->
-                            <textarea class="form-control" name="message" id="message" rows="1"
+                            <textarea class="form-control" name="order_notes" id="message" rows="1"
                                 placeholder="Order Notes"></textarea>
                         </div>
                     </form>
@@ -294,7 +302,8 @@
                             <label for="f-option4">I’ve read and accept the </label>
                             <a href="#">terms & conditions*</a>
                         </div> -->
-                        <a class="btn_3" href="#">Confirm Order</a>
+                        <a class="btn_3" href="#"
+                            onclick="document.getElementById('billing-form').submit(); return false;">Confirm Order</a>
                     </div>
                 </div>
             </div>
