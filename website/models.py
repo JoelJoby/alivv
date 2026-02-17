@@ -116,6 +116,19 @@ class Customer(models.Model):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+class CustomerDetails(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(max_length=255)
+    address_line_2 = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    district = models.CharField(max_length=100)
+    postcode = models.CharField(max_length=20)
+    order_notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Details for {self.customer}"
+
 class Order(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)

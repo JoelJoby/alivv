@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Account Details - Alivv{% endblock %}
+
+{% block content %}
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>Account Details</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="checkout_area section_padding">
+    <div class="container">
+        <div class="billing_details">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h3>Add New Address</h3>
+                    <form class="row contact_form" action="{% url 'customer_details' %}" method="post"
+                        novalidate="novalidate">
+                        {% csrf_token %}
+                        <div class="col-md-12 form-group p_star">
+                            <!-- Using standard select for simplicity if nice-select is not configured perfectly -->
+                            <select class="form-control" name="country">
+                                <option value="" selected disabled>Country</option>
+                                <option value="Bangladesh">Bangladesh</option>
+                                <option value="India">India</option>
+                                <option value="Pakistan">Pakistan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="add1" name="address_line_01"
+                                placeholder="Address line 01 *" required />
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="add2" name="address_line_02"
+                                placeholder="Address line 02 *" />
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="city" name="town_city" placeholder="Town/City *"
+                                required />
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <select class="form-control" name="district">
+                                <option value="" selected disabled>District</option>
+                                <option value="District 1">District 1</option>
+                                <option value="District 2">District 2</option>
+                                <option value="District 3">District 3</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <input type="text" class="form-control" id="zip" name="postcode_zip"
+                                placeholder="Postcode/ZIP" required />
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <textarea class="form-control" name="order_notes" id="message" rows="1"
+                                placeholder="Order Notes"></textarea>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="btn_3">
+                                Save Details
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-lg-4">
+                    <div class="order_box">
+                        <h2>Your Details</h2>
+                        {% for detail in details %}
+                        <div class="payment_item">
+                            <p>
+                                <strong>Address {{ forloop.counter }}</strong><br>
+                                {{ detail.address_line_1 }}<br>
+                                {% if detail.address_line_2 %}{{ detail.address_line_2 }}<br>{% endif %}
+                                {{ detail.city }}, {{ detail.district }}<br>
+                                {{ detail.country }} - {{ detail.postcode }}
+                            </p>
+                        </div>
+                        <hr>
+                        {% empty %}
+                        <p>No details saved yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

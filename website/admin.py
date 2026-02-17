@@ -9,11 +9,13 @@ from .models import (
     Season, 
     Size,
     Subscriber,
+    CustomerDetails,
 )
 
 # Register models only once
 admin.site.register(Category)
 admin.site.register(Customer)
+admin.site.register(CustomerDetails)
 admin.site.register(ProductImage)
 admin.site.register(Order)
 admin.site.register(Testimonial)

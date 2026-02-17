@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django import forms 
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth.models import User
-from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails
 
 def subscribe(request):
     if request.method == 'POST':
@@ -392,3 +393,44 @@ def create_account(request):
             return redirect('create_account')
         
     return render(request, 'create_account.html')
+
+@login_required
+def customer_details(request):
+    # Retrieve customer based on logged-in user's email
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+    except Customer.DoesNotExist:
+        messages.error(request, "Customer account not found.")
+        return redirect('home')
+
+    if request.method == 'POST':
+        country = request.POST.get('country')
+        address_line_1 = request.POST.get('address_line_01')
+        address_line_2 = request.POST.get('address_line_02')
+        city = request.POST.get('town_city')
+        district = request.POST.get('district')
+        postcode = request.POST.get('postcode_zip')
+        order_notes = request.POST.get('order_notes')
+
+        if country and address_line_1 and city and postcode:
+            CustomerDetails.objects.create(
+                customer=customer,
+                country=country,
+                address_line_1=address_line_1,
+                address_line_2=address_line_2,
+                city=city,
+                district=district,
+                postcode=postcode,
+                order_notes=order_notes
+            )
+            messages.success(request, "Address details added successfully.")
+            return redirect('customer_details')
+        else:
+            messages.error(request, "Please fill all required fields.")
+
+    details = CustomerDetails.objects.filter(customer=customer)
+    
+    return render(request, 'customer_details.html', {
+        'customer': customer,
+        'details': details
+    })
