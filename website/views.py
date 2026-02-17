@@ -311,9 +311,21 @@ def checkout(request):
             })
             total_amount += item_total
             
+    countries = Country.objects.all().order_by('name')
+    
+    user_addresses = []
+    if request.user.is_authenticated:
+        try:
+            customer = Customer.objects.get(email=request.user.email)
+            user_addresses = CustomerDetails.objects.filter(customer=customer)
+        except Customer.DoesNotExist:
+            pass
+
     return render(request, 'checkout.html', {
         'cart_items': cart_items,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'countries': countries,
+        'user_addresses': user_addresses
     })
 
 def login_view(request):

@@ -1,6 +1,62 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block scripts %}
+<script>
+    function handleCountryChange(selectElement) {
+        fetchStates(selectElement.value);
+    }
+
+    function fetchStates(countryId, selectedStateId = null) {
+        const stateSelect = document.getElementById('state-select');
+        stateSelect.innerHTML = '<option value="" selected disabled>Loading...</option>';
+
+        fetch(`{% url 'get_states' %}?country_id=${countryId}`)
+            .then(response => response.json())
+            .then(data => {
+                stateSelect.innerHTML = '<option value="" selected disabled>Select State</option>';
+                data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+                    stateSelect.appendChild(option);
+                });
+                if (selectedStateId) {
+                    stateSelect.value = selectedStateId;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching states:', error);
+                stateSelect.innerHTML = '<option value="" selected disabled>Error loading states</option>';
+            });
+    }
+
+    function fillAddress(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        if (!selectedOption.value) return;
+
+        // Populate fields
+        if (document.getElementById('first')) document.getElementById('first').value = selectedOption.dataset.first;
+        if (document.getElementById('last')) document.getElementById('last').value = selectedOption.dataset.last;
+        if (document.getElementById('number')) document.getElementById('number').value = selectedOption.dataset.phone;
+        if (document.getElementById('email')) document.getElementById('email').value = selectedOption.dataset.email;
+        if (document.getElementById('add1')) document.getElementById('add1').value = selectedOption.dataset.add1;
+        if (document.getElementById('add2')) document.getElementById('add2').value = selectedOption.dataset.add2;
+        if (document.getElementById('city')) document.getElementById('city').value = selectedOption.dataset.city;
+        if (document.getElementById('zip')) document.getElementById('zip').value = selectedOption.dataset.zip;
+
+        const countryId = selectedOption.dataset.country;
+        const stateId = selectedOption.dataset.state;
+
+        const countrySelect = document.getElementById('country-select');
+        if (countrySelect) {
+            countrySelect.value = countryId;
+            fetchStates(countryId, stateId);
+        }
+    }
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- breadcrumb part start-->
 <section class="breadcrumb_part">
@@ -70,6 +126,24 @@
             <div class="row">
                 <div class="col-lg-8">
                     <h3>Billing Details</h3>
+                    {% if user_addresses %}
+                    <div class="form-group">
+                        <label for="saved-address-select">Select a saved address:</label>
+                        <select class="form-control" id="saved-address-select" onchange="fillAddress(this)">
+                            <option value="">-- Select Address --</option>
+                            {% for address in user_addresses %}
+                            <option value="{{ address.id }}" data-first="{{ address.customer.first_name }}"
+                                data-last="{{ address.customer.last_name }}" data-email="{{ address.customer.email }}"
+                                data-phone="{{ address.customer.phone }}" data-add1="{{ address.address_line_1 }}"
+                                data-add2="{{ address.address_line_2|default:'' }}" data-city="{{ address.city }}"
+                                data-zip="{{ address.postcode }}" data-country="{{ address.country_id }}"
+                                data-state="{{ address.state_id|default:'' }}">
+                                {{ address.address_line_1 }} - {{ address.city }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
                     <form class="row contact_form" action="#" method="post" novalidate="novalidate">
                         {% csrf_token %}
                         <div class="col-md-6 form-group p_star">
@@ -93,10 +167,19 @@
                             <span class="placeholder" data-placeholder="Email Address"></span>
                         </div>
                         <div class="col-md-12 form-group p_star">
-                            <select class="country_select">
-                                <option value="1">Country</option>
-                                <option value="2">Country</option>
-                                <option value="4">Country</option>
+                            <!-- Using standard select for simplicity if nice-select is not configured perfectly -->
+                            <!-- Dynamic Country Select -->
+                            <select class="form-control" name="country" id="country-select"
+                                onchange="handleCountryChange(this)">
+                                <option value="" selected disabled>Select Country</option>
+                                {% for country in countries %}
+                                <option value="{{ country.id }}">{{ country.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group p_star">
+                            <select class="form-control" name="state" id="state-select">
+                                <option value="" selected disabled>Select State</option>
                             </select>
                         </div>
                         <div class="col-md-12 form-group p_star">
@@ -110,13 +193,6 @@
                         <div class="col-md-12 form-group p_star">
                             <input type="text" class="form-control" id="city" name="city" />
                             <span class="placeholder" data-placeholder="Town/City"></span>
-                        </div>
-                        <div class="col-md-12 form-group p_star">
-                            <select class="country_select">
-                                <option value="1">District</option>
-                                <option value="2">District</option>
-                                <option value="4">District</option>
-                            </select>
                         </div>
                         <div class="col-md-12 form-group">
                             <input type="text" class="form-control" id="zip" name="zip" placeholder="Postcode/ZIP" />
