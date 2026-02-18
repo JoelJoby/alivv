@@ -9,7 +9,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth.models import User
-from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State, Order
+from django.contrib.auth.hashers import check_password, make_password
+from .models import Product,Category,Testimonial,Season,Subscriber,Size,Customer,CustomerDetails, Country, State, Order, Staff
+from functools import wraps
 
 def subscribe(request):
     if request.method == 'POST':
@@ -630,3 +632,51 @@ def my_orders(request):
         orders = []
     
     return render(request, 'my_orders.html', {'orders': orders})
+
+# Staff Authentication System
+
+def staff_login_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if 'staff_id' not in request.session:
+            messages.warning(request, "Restricted access. Please login.")
+            return redirect('staff_login')
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+def staff_login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        try:
+            staff = Staff.objects.get(email=email)
+            if check_password(password, staff.password):
+                if staff.is_active:
+                    request.session['staff_id'] = staff.id
+                    messages.success(request, f"Welcome, {staff.name}!")
+                    return redirect('staff_dashboard')
+                else:
+                    messages.error(request, "Account is inactive. Contact admin.")
+            else:
+                messages.error(request, "Invalid credentials.")
+        except Staff.DoesNotExist:
+            messages.error(request, "Invalid credentials.")
+            
+    return render(request, 'employee/login.html')
+
+def staff_logout(request):
+    if 'staff_id' in request.session:
+        del request.session['staff_id']
+        messages.success(request, "Staff logged out successfully.")
+    return redirect('staff_login')
+
+@staff_login_required
+def staff_dashboard(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        del request.session['staff_id']
+        return redirect('staff_login')
+        
+    return render(request, 'employee/dashboard.html', {'staff': staff})

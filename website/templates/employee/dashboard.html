@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Staff Dashboard - Alivv{% endblock %}
+
+{% block content %}
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>Staff Dashboard</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section_padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="dashboard_content">
+                    <h3>Welcome, {{ staff.name }}</h3>
+                    <p>This is the staff dashboard.</p>
+                    <a href="{% url 'staff_logout' %}" class="btn_3">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
