@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from urllib.parse import quote
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -333,6 +334,8 @@ def checkout(request):
         products = Product.objects.filter(id__in=product_ids)
         product_map = {p.id: p for p in products}
         
+        created_order_ids = []
+        
         for item_id, quantity in cart.items():
              parts = item_id.split('-')
              # Skip invalid keys
@@ -344,7 +347,7 @@ def checkout(request):
              
              product = product_map.get(p_id)
              if product:
-                 Order.objects.create(
+                 new_order = Order.objects.create(
                      product=product,
                      customer=customer,
                      quantity=quantity,
@@ -353,10 +356,19 @@ def checkout(request):
                      size=size,
                      status=False
                  )
+                 created_order_ids.append(str(new_order.id))
         
         # Clear Cart
         request.session['cart'] = {}
-        messages.success(request, "Order placed successfully!")
+        # messages.success(request, "Order placed successfully!")
+        
+        # Redirect to WhatsApp
+        if created_order_ids:
+            ids_str = ", ".join(created_order_ids)
+            msg = f"Hello, I have placed an order. Order IDs: {ids_str}"
+            whatsapp_url = f"https://wa.me/918078956972?text={quote(msg)}"
+            return redirect(whatsapp_url)
+
         return redirect('home')
         
     cart = request.session.get('cart', {})
