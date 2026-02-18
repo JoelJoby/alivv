@@ -608,3 +608,13 @@ def get_states(request):
     states = State.objects.filter(country_id=country_id).order_by('name')
     data = list(states.values('id', 'name'))
     return JsonResponse(data, safe=False)
+
+@login_required
+def my_orders(request):
+    try:
+        customer = Customer.objects.get(email=request.user.email)
+        orders = Order.objects.filter(customer=customer).order_by('-date')
+    except Customer.DoesNotExist:
+        orders = []
+    
+    return render(request, 'my_orders.html', {'orders': orders})
