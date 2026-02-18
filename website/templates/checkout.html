@@ -302,8 +302,12 @@
                             <label for="f-option4">I’ve read and accept the </label>
                             <a href="#">terms & conditions*</a>
                         </div> -->
+                        {% if user.is_authenticated %}
                         <a class="btn_3" href="#"
                             onclick="document.getElementById('billing-form').submit(); return false;">Confirm Order</a>
+                        {% else %}
+                        <a class="btn_3" href="{% url 'login' %}?next={% url 'checkout' %}">Login to Place Order</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
