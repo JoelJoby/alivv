@@ -193,7 +193,7 @@
                 <a href="{% url 'staff_dashboard' %}" class="list-group-item list-group-item-action active">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
+                <a href="{% url 'staff_orders' %}" class="list-group-item list-group-item-action">
                     <i class="fas fa-shopping-bag"></i> Orders
                 </a>
                 <a href="#" class="list-group-item list-group-item-action">
@@ -359,8 +359,10 @@
                                                 <td>{{ order.product.name }}</td>
                                                 <td>{{ order.date|date:"M d, Y" }}</td>
                                                 <td>
-                                                    {% if order.status %}
-                                                    <span class="badge bg-success">Completed</span>
+                                                    {% if order.status == 'accepted' %}
+                                                    <span class="badge bg-success">Accepted</span>
+                                                    {% elif order.status == 'rejected' %}
+                                                    <span class="badge bg-danger">Rejected</span>
                                                     {% else %}
                                                     <span class="badge bg-warning text-dark">Pending</span>
                                                     {% endif %}

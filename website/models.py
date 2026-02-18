@@ -137,7 +137,12 @@ class Order(models.Model):
     phone = models.CharField(max_length=20, default='', blank=True)
     size = models.CharField(max_length=20, default='', blank=True)
     date = models.DateField(default=datetime.datetime.today)
-    status = models.BooleanField(default=False)
+    status = models.CharField(
+        max_length=20,
+        choices=[('pending','Pending'),('accepted','Accepted'),('rejected','Rejected')],
+        default='pending'
+    )
+    staff_comment = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.product} - {self.quantity}"

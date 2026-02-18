@@ -356,7 +356,7 @@ def checkout(request):
                      address=address,
                      phone=request.POST.get('phone', ''),
                      size=size,
-                     status=False
+                     status='pending'
                  )
                  created_order_ids.append(str(new_order.id))
         
@@ -682,7 +682,7 @@ def staff_dashboard(request):
     total_orders = Order.objects.count()
     total_products = Product.objects.count()
     total_customers = Customer.objects.count()
-    pending_requests = Order.objects.filter(status=False).count()
+    pending_requests = Order.objects.filter(status='pending').count()
     recent_orders = Order.objects.order_by('-date')[:5]
         
     return render(request, 'employee/dashboard.html', {
@@ -693,3 +693,38 @@ def staff_dashboard(request):
         'pending_requests': pending_requests,
         'recent_orders': recent_orders
     })
+
+@staff_login_required
+def staff_orders(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        action = request.POST.get('action')
+        staff_comment = request.POST.get('staff_comment')
+        
+        try:
+            order = Order.objects.get(id=order_id)
+            if action == 'accept':
+                order.status = 'accepted'
+                order.save()
+                messages.success(request, f"Order #{order.id} accepted.")
+            elif action == 'reject':
+                if not staff_comment:
+                    messages.error(request, "Comment is required when rejecting an order.")
+                else:
+                    order.status = 'rejected'
+                    order.staff_comment = staff_comment
+                    order.save()
+                    messages.success(request, f"Order #{order.id} rejected.")
+        except Order.DoesNotExist:
+            messages.error(request, "Order ID not found.")
+            
+        return redirect('staff_orders')
+
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    orders = Order.objects.all().order_by('-date')
+    return render(request, 'employee/orders.html', {'orders': orders, 'staff': staff})
+
