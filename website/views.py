@@ -678,5 +678,18 @@ def staff_dashboard(request):
     except Staff.DoesNotExist:
         del request.session['staff_id']
         return redirect('staff_login')
+
+    total_orders = Order.objects.count()
+    total_products = Product.objects.count()
+    total_customers = Customer.objects.count()
+    pending_requests = Order.objects.filter(status=False).count()
+    recent_orders = Order.objects.order_by('-date')[:5]
         
-    return render(request, 'employee/dashboard.html', {'staff': staff})
+    return render(request, 'employee/dashboard.html', {
+        'staff': staff,
+        'total_orders': total_orders,
+        'total_products': total_products,
+        'total_customers': total_customers,
+        'pending_requests': pending_requests,
+        'recent_orders': recent_orders
+    })
