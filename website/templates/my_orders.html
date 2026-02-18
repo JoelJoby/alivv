@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<section class="breadcrumb_part">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb_iner">
+                    <h2>My Orders</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cart_area section_padding">
+    <div class="container">
+        <div class="cart_inner">
+            <div class="table-responsive">
+                {% if orders %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Order ID</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>
+                                <h5>#{{ order.id }}</h5>
+                            </td>
+                            <td>
+                                <div class="media">
+                                    <div class="d-flex">
+                                        <img src="{{ order.product.image.url }}" alt=""
+                                            style="width: 100px; height: 100px; object-fit: cover;">
+                                    </div>
+                                    <div class="media-body">
+                                        <p>{{ order.product.name }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <h5>{{ order.date }}</h5>
+                            </td>
+                            <td>
+                                <h5>{{ order.quantity }}</h5>
+                            </td>
+                            <td>
+                                <h5>{{ order.size }}</h5>
+                            </td>
+                            <td>
+                                {% if order.status %}
+                                <span class="badge badge-success">Completed</span>
+                                {% else %}
+                                <span class="badge badge-warning">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center">
+                    <h3>You have no orders yet.</h3>
+                    <a class="btn_1" href="{% url 'product_list' %}">Shop Now</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
