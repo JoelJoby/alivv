@@ -1,0 +1,142 @@
+{% extends 'employee/employee_base.html' %}
+{% load static %}
+
+{% block title %}Employee Dashboard - Alivv{% endblock %}
+
+{% block content %}
+<div class="row welcome-section mb-4">
+    <div class="col-12">
+        <h3>Dashboard</h3>
+        <p class="text-muted">Overview of your store's performance</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-dashboard bg-gradient-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small text-uppercase fw-bold mb-1">New Orders</div>
+                        <div class="h2 mb-0 fw-bold">{{ total_orders }}</div>
+                    </div>
+                    <i class="fas fa-shopping-bag stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-dashboard bg-gradient-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small text-uppercase fw-bold mb-1">Total Products
+                        </div>
+                        <div class="h2 mb-0 fw-bold">{{ total_products }}</div>
+                    </div>
+                    <i class="fas fa-box-open stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-dashboard bg-gradient-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small text-uppercase fw-bold mb-1">Customers</div>
+                        <div class="h2 mb-0 fw-bold">{{ total_customers }}</div>
+                    </div>
+                    <i class="fas fa-users stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-dashboard bg-gradient-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small text-uppercase fw-bold mb-1">Pending Requests
+                        </div>
+                        <div class="h2 mb-0 fw-bold">{{ pending_requests }}</div>
+                    </div>
+                    <i class="fas fa-comments stat-icon"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Orders Placeholder -->
+    <div class="col-lg-8">
+        <div class="card content-card h-100">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold">Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.customer.first_name }} {{ order.customer.last_name }}</td>
+                                <td>{{ order.product.name }}</td>
+                                <td>{{ order.date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if order.status == 'accepted' %}
+                                    <span class="badge bg-success">Accepted</span>
+                                    {% elif order.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No recent orders found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'staff_orders' %}" class="btn btn-sm btn-light">View All Orders</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <div class="card content-card mb-4">
+            <div class="card-header bg-white border-0 py-3">
+                <h5 class="mb-0 fw-bold">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary text-start"><i class="fas fa-plus me-2"></i>
+                        Add New Product</button>
+                    <button class="btn btn-outline-primary text-start"><i class="fas fa-folder-plus me-2"></i> Create
+                        Category</button>
+                    <button class="btn btn-outline-primary text-start"><i class="fas fa-user-plus me-2"></i> Add Staff
+                        Member</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
