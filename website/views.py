@@ -715,6 +715,10 @@ def staff_orders(request):
                     order.staff_comment = staff_comment
                     order.save()
                     messages.success(request, f"Order #{order.id} rejected.")
+            elif action == 'pending':
+                order.status = 'pending'
+                order.save()
+                messages.success(request, f"Order #{order.id} set to pending.")
         except Order.DoesNotExist:
             messages.error(request, "Order ID not found.")
             
