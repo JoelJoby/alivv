@@ -2,6 +2,15 @@
 {% load static %}
 
 {% block content%}
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+<script type="text/javascript">
+    (function () {
+        emailjs.init({
+            publicKey: "BY2PfrP6uCTDkkIKm",
+        });
+    })();
+</script>
 <!-- breadcrumb part start-->
 <section class="breadcrumb_part">
     <div class="container">
@@ -66,7 +75,14 @@
                         </div>
                     </div>
                     <div class="form-group mt-3">
-                        <a href="#" class="btn_3 button-contactForm">Send Message</a>
+                        <button type="button" onclick="sendEmail()" class="btn_3 button-contactForm">Send
+                            Message</button>
+                        <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                            Your message has been sent successfully!
+                        </div>
+                        <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                            Failed to send message. Please try again.
+                        </div>
                     </div>
                 </form>
             </div>
@@ -100,4 +116,34 @@
 </section>
 <!-- ================ contact section end ================= -->
 
+<script>
+    function sendEmail() {
+        let params = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            subject: document.getElementById("subject").value,
+            message: document.getElementById("message").value,
+        }
+
+        emailjs.send("service_5utyvhi", "template_9x7pkpv", params)
+            .then(function (response) {
+                console.log("SUCCESS", response.status, response.text);
+                if (response.text === "OK") {
+                    document.getElementById("successMessage").style.display = "block";
+                    document.getElementById("errorMessage").style.display = "none";
+                    document.getElementById("contactForm").reset();
+                    setTimeout(() => {
+                        document.getElementById("successMessage").style.display = "none";
+                    }, 5000);
+                } else {
+                    document.getElementById("errorMessage").style.display = "block";
+                    document.getElementById("successMessage").style.display = "none";
+                }
+            }, function (error) {
+                console.log("FAILED", error);
+                document.getElementById("errorMessage").style.display = "block";
+                document.getElementById("successMessage").style.display = "none";
+            });
+    }
+</script>
 {% endblock %}
