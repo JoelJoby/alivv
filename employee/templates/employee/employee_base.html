@@ -195,7 +195,8 @@
                     class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_orders' %}active{% endif %}">
                     <i class="fas fa-shopping-bag"></i> Orders
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
+                <a href="{% url 'staff_categories' %}"
+                    class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_categories' %}active{% endif %}">
                     <i class="fas fa-list"></i> Categories
                 </a>
                 <a href="#" class="list-group-item list-group-item-action">
