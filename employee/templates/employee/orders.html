@@ -54,6 +54,8 @@
                         <td>
                             {% if order.status == 'accepted' %}
                             <span class="badge bg-success">Accepted</span>
+                            {% elif order.status == 'completed' %}
+                            <span class="badge bg-primary">Completed</span>
                             {% elif order.status == 'rejected' %}
                             <span class="badge bg-danger">Rejected</span>
                             {% if order.staff_comment %}
@@ -73,6 +75,18 @@
                                     <button type="submit" class="btn btn-sm btn-success"
                                         onclick="return confirm('Are you sure you want to accept this order?');">
                                         Accept
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if order.status != 'completed' %}
+                                <form method="POST" action="{% url 'staff_orders' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                    <input type="hidden" name="action" value="completed">
+                                    <button type="submit" class="btn btn-sm btn-primary"
+                                        onclick="return confirm('Are you sure you want to mark this order as completed?');">
+                                        Complete
                                     </button>
                                 </form>
                                 {% endif %}

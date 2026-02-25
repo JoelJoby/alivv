@@ -91,6 +91,10 @@ def staff_orders(request):
                 order.status = 'pending'
                 order.save()
                 messages.success(request, f"Order #{order.id} set to pending.")
+            elif action == 'completed':
+                order.status = 'completed'
+                order.save()
+                messages.success(request, f"Order #{order.id} marked as completed.")
         except Order.DoesNotExist:
             messages.error(request, "Order ID not found.")
             
