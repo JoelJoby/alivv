@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from functools import wraps
 
-from website.models import Product, Customer, Order, Staff
+from website.models import Product, Customer, Order, Staff, Category
 
 # Staff Authentication System
 
@@ -107,3 +107,58 @@ def staff_orders(request):
         
     orders = Order.objects.all().order_by('-date')
     return render(request, 'employee/orders.html', {'orders': orders, 'staff': staff})
+
+@staff_login_required
+def staff_categories(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            image = request.FILES.get('image')
+            is_top_category = request.POST.get('is_top_category') == 'on'
+            priority = request.POST.get('priority', 0)
+            
+            category = Category(
+                name=name,
+                is_top_category=is_top_category,
+                priority=priority
+            )
+            if image:
+                category.image = image
+            category.save()
+            messages.success(request, f"Category '{name}' added successfully.")
+            
+        elif action == 'edit':
+            category_id = request.POST.get('category_id')
+            try:
+                category = Category.objects.get(id=category_id)
+                category.name = request.POST.get('name')
+                if request.FILES.get('image'):
+                    category.image = request.FILES.get('image')
+                category.is_top_category = request.POST.get('is_top_category') == 'on'
+                category.priority = request.POST.get('priority', 0)
+                category.save()
+                messages.success(request, f"Category '{category.name}' updated successfully.")
+            except Category.DoesNotExist:
+                messages.error(request, "Category not found.")
+                
+        elif action == 'delete':
+            category_id = request.POST.get('category_id')
+            try:
+                category = Category.objects.get(id=category_id)
+                name = category.name
+                category.delete()
+                messages.success(request, f"Category '{name}' deleted successfully.")
+            except Category.DoesNotExist:
+                messages.error(request, "Category not found.")
+                
+        return redirect('staff_categories')
+
+    categories = Category.objects.all().order_by('-id')
+    return render(request, 'employee/categories.html', {'categories': categories, 'staff': staff})
