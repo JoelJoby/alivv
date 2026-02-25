@@ -139,7 +139,7 @@ class Order(models.Model):
     date = models.DateField(default=datetime.datetime.today)
     status = models.CharField(
         max_length=20,
-        choices=[('pending','Pending'),('accepted','Accepted'),('rejected','Rejected')],
+        choices=[('pending','Pending'),('accepted','Accepted'),('rejected','Rejected'),('completed','Completed')],
         default='pending'
     )
     staff_comment = models.TextField(blank=True, null=True)

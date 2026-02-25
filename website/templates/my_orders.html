@@ -61,6 +61,8 @@
                             <td>
                                 {% if order.status == 'accepted' %}
                                 <span class="badge badge-success">Accepted</span>
+                                {% elif order.status == 'completed' %}
+                                <span class="badge badge-primary">Completed</span>
                                 {% elif order.status == 'rejected' %}
                                 <span class="badge badge-danger">Rejected</span>
                                 {% else %}
