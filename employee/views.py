@@ -162,3 +162,105 @@ def staff_categories(request):
 
     categories = Category.objects.all().order_by('-id')
     return render(request, 'employee/categories.html', {'categories': categories, 'staff': staff})
+
+@staff_login_required
+def staff_products(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    from website.models import Size # Assuming we need size and category
+    categories = Category.objects.all()
+    sizes_all = Size.objects.all()
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            price = request.POST.get('price', 0)
+            category_id = request.POST.get('category')
+            description = request.POST.get('description', '')
+            image = request.FILES.get('image')
+            is_sale = request.POST.get('is_sale') == 'on'
+            sale_price = request.POST.get('sale_price', 0)
+            is_top_product = request.POST.get('is_top_product') == 'on'
+            priority = request.POST.get('priority', 0)
+            sizes_ids = request.POST.getlist('sizes')
+            
+            try:
+                category = Category.objects.get(id=category_id)
+                product = Product(
+                    name=name,
+                    price=price,
+                    category=category,
+                    description=description,
+                    is_sale=is_sale,
+                    sale_price=sale_price,
+                    is_top_product=is_top_product,
+                    priority=priority
+                )
+                if image:
+                    product.image = image
+                product.save()
+                
+                if sizes_ids:
+                    sizes = Size.objects.filter(id__in=sizes_ids)
+                    product.sizes.set(sizes)
+                    
+                messages.success(request, f"Product '{name}' added successfully.")
+            except Category.DoesNotExist:
+                messages.error(request, "Selected Category not found.")
+            
+        elif action == 'edit':
+            product_id = request.POST.get('product_id')
+            try:
+                product = Product.objects.get(id=product_id)
+                product.name = request.POST.get('name')
+                product.price = request.POST.get('price', 0)
+                category_id = request.POST.get('category')
+                try:    
+                    product.category = Category.objects.get(id=category_id)
+                except Category.DoesNotExist:
+                    pass
+                product.description = request.POST.get('description', '')
+                if request.FILES.get('image'):
+                    product.image = request.FILES.get('image')
+                    
+                product.is_sale = request.POST.get('is_sale') == 'on'
+                product.sale_price = request.POST.get('sale_price', 0)
+                product.is_top_product = request.POST.get('is_top_product') == 'on'
+                product.priority = request.POST.get('priority', 0)
+                product.save()
+                
+                sizes_ids = request.POST.getlist('sizes')
+                if sizes_ids:
+                    sizes = Size.objects.filter(id__in=sizes_ids)
+                    product.sizes.set(sizes)
+                else:
+                    product.sizes.clear()
+                    
+                messages.success(request, f"Product '{product.name}' updated successfully.")
+            except Product.DoesNotExist:
+                messages.error(request, "Product not found.")
+                
+        elif action == 'delete':
+            product_id = request.POST.get('product_id')
+            try:
+                product = Product.objects.get(id=product_id)
+                name = product.name
+                product.delete()
+                messages.success(request, f"Product '{name}' deleted successfully.")
+            except Product.DoesNotExist:
+                messages.error(request, "Product not found.")
+                
+        return redirect('staff_products')
+
+    products = Product.objects.all().order_by('-id')
+    return render(request, 'employee/products.html', {
+        'products': products, 
+        'staff': staff,
+        'categories': categories,
+        'sizes_all': sizes_all
+    })
