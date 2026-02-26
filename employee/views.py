@@ -379,3 +379,49 @@ def staff_seasons(request):
 
     seasons = Season.objects.all().order_by('-id')
     return render(request, 'employee/seasons.html', {'seasons': seasons, 'staff': staff})
+
+@staff_login_required
+def staff_sizes(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    from website.models import Size
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            code = request.POST.get('code', '')
+            
+            size = Size(name=name, code=code)
+            size.save()
+            messages.success(request, f"Size '{name}' added successfully.")
+            
+        elif action == 'edit':
+            size_id = request.POST.get('size_id')
+            try:
+                size = Size.objects.get(id=size_id)
+                size.name = request.POST.get('name')
+                size.code = request.POST.get('code', '')
+                size.save()
+                messages.success(request, f"Size '{size.name}' updated successfully.")
+            except Size.DoesNotExist:
+                messages.error(request, "Size not found.")
+                
+        elif action == 'delete':
+            size_id = request.POST.get('size_id')
+            try:
+                size = Size.objects.get(id=size_id)
+                name = size.name
+                size.delete()
+                messages.success(request, f"Size '{name}' deleted successfully.")
+            except Size.DoesNotExist:
+                messages.error(request, "Size not found.")
+                
+        return redirect('staff_sizes')
+
+    sizes = Size.objects.all().order_by('-id')
+    return render(request, 'employee/sizes.html', {'sizes': sizes, 'staff': staff})

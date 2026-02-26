@@ -211,7 +211,8 @@
                     class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_seasons' %}active{% endif %}">
                     <i class="fas fa-cloud-sun"></i> Seasons
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
+                <a href="{% url 'staff_sizes' %}"
+                    class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_sizes' %}active{% endif %}">
                     <i class="fas fa-ruler"></i> Sizes
                 </a>
                 <a href="#" class="list-group-item list-group-item-action">
