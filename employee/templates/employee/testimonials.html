@@ -97,8 +97,8 @@
                                         <input type="file" class="form-control" id="image{{ testimonial.id }}"
                                             name="image" accept="image/*">
                                         {% if testimonial.image %}
-                                        <small class="text-muted d-block mt-1">Current image: {{ testimonial.image.name
-                                            }}</small>
+                                        <small class="text-muted d-block mt-1">
+                                            Current image: {{ testimonial.image.name }}</small>
                                         <img src="{{ testimonial.image.url }}" alt="Preview" class="img-thumbnail mt-2"
                                             style="height: 50px; width: 50px; object-fit: cover; border-radius: 50%;">
                                         {% endif %}

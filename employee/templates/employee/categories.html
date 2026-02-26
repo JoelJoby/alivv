@@ -117,18 +117,23 @@
                         {% if category.image %}
                         <small class="text-muted d-block mt-1">Current image: {{ category.image.name }}</small>
                         {% endif %}
+                        <small class="form-text text-muted">Please upload an image for the category in 520*435
+                            resolution.</small>
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_top_category{{ category.id }}"
                             name="is_top_category" {% if category.is_top_category %}checked{% endif %}>
                         <label class="form-check-label" for="is_top_category{{ category.id }}">Mark as
                             Top Category</label>
+                        <small class="form-text text-muted d-block">Select this to mark as a Top Category</small>
                     </div>
                     <div class="mb-3">
                         <label for="priority{{ category.id }}" class="form-label">Priority (For Top
                             Categories)</label>
                         <input type="number" class="form-control" id="priority{{ category.id }}" name="priority"
                             value="{{ category.priority }}" min="0">
+                        <small class="form-text text-muted">Use 1, 2, or 3 to define order for top categories. Leave as
+                            0 if not a top category.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -191,14 +196,19 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">Image</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <small class="form-text text-muted">Please upload an image for the category in 520*435
+                            resolution.</small>
                     </div>
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_top_category" name="is_top_category">
                         <label class="form-check-label" for="is_top_category">Mark as Top Category</label>
+                        <small class="form-text text-muted d-block">Select this to mark as a Top Category</small>
                     </div>
                     <div class="mb-3">
                         <label for="priority" class="form-label">Priority (For Top Categories)</label>
                         <input type="number" class="form-control" id="priority" name="priority" value="0" min="0">
+                        <small class="form-text text-muted">Use 1, 2, or 3 to define order for top categories. Leave as
+                            0 if not a top category.</small>
                     </div>
                 </div>
                 <div class="modal-footer">
