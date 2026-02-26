@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from functools import wraps
 
-from website.models import Product, Customer, Order, Staff, Category
+from website.models import Product, Customer, Order, Staff, Category, Season
 
 # Staff Authentication System
 
@@ -264,3 +264,118 @@ def staff_products(request):
         'categories': categories,
         'sizes_all': sizes_all
     })
+
+@staff_login_required
+def staff_all_product_images(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    products = Product.objects.all().order_by('-id').prefetch_related('images')
+    return render(request, 'employee/all_product_images.html', {
+        'products': products, 
+        'staff': staff
+    })
+
+@staff_login_required
+def staff_product_images(request, product_id):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        messages.error(request, "Product not found.")
+        return redirect('staff_products')
+
+    from website.models import ProductImage
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add_images':
+            images = request.FILES.getlist('images')
+            count = 0
+            for img in images:
+                ProductImage.objects.create(product=product, image=img)
+                count += 1
+            if count > 0:
+                messages.success(request, f"Added {count} image(s) to '{product.name}'.")
+            else:
+                messages.warning(request, "No images selected to upload.")
+                
+        elif action == 'delete_image':
+            image_id = request.POST.get('image_id')
+            try:
+                img = ProductImage.objects.get(id=image_id, product=product)
+                img.delete()
+                messages.success(request, "Image deleted successfully.")
+            except ProductImage.DoesNotExist:
+                messages.error(request, "Image not found.")
+                
+        return redirect('staff_product_images', product_id=product.id)
+        
+    images = product.images.all()
+    return render(request, 'employee/product_images.html', {
+        'product': product,
+        'images': images,
+        'staff': staff
+    })
+
+@staff_login_required
+def staff_seasons(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            description = request.POST.get('description', '')
+            banner_image = request.FILES.get('banner_image')
+            is_active = request.POST.get('is_active') == 'on'
+            
+            season = Season(
+                name=name,
+                description=description,
+                is_active=is_active
+            )
+            if banner_image:
+                season.banner_image = banner_image
+            season.save()
+            messages.success(request, f"Season '{name}' added successfully.")
+            
+        elif action == 'edit':
+            season_id = request.POST.get('season_id')
+            try:
+                season = Season.objects.get(id=season_id)
+                season.name = request.POST.get('name')
+                season.description = request.POST.get('description', '')
+                if request.FILES.get('banner_image'):
+                    season.banner_image = request.FILES.get('banner_image')
+                season.is_active = request.POST.get('is_active') == 'on'
+                season.save()
+                messages.success(request, f"Season '{season.name}' updated successfully.")
+            except Season.DoesNotExist:
+                messages.error(request, "Season not found.")
+                
+        elif action == 'delete':
+            season_id = request.POST.get('season_id')
+            try:
+                season = Season.objects.get(id=season_id)
+                name = season.name
+                season.delete()
+                messages.success(request, f"Season '{name}' deleted successfully.")
+            except Season.DoesNotExist:
+                messages.error(request, "Season not found.")
+                
+        return redirect('staff_seasons')
+
+    seasons = Season.objects.all().order_by('-id')
+    return render(request, 'employee/seasons.html', {'seasons': seasons, 'staff': staff})

@@ -1,0 +1,218 @@
+{% extends 'employee/employee_base.html' %}
+
+{% block title %}Seasons Management - Alivv{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="mb-0 text-dark" style="font-weight: 600;">Seasons Management</h2>
+        <p class="text-muted mb-0">Manage promotional seasons and banners.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSeasonModal">
+            <i class="fas fa-plus-circle me-1"></i> Add New Season
+        </button>
+    </div>
+</div>
+
+{% if messages %}
+<div class="row">
+    <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card content-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Banner Image</th>
+                    <th scope="col">Season Name</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for season in seasons %}
+                <tr>
+                    <td>#{{ season.id }}</td>
+                    <td>
+                        {% if season.banner_image %}
+                        <img src="{{ season.banner_image.url }}" alt="{{ season.name }}" class="img-thumbnail"
+                            style="width: 120px; height: 60px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+                            style="width: 120px; height: 60px;">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="fw-bold">{{ season.name }}</td>
+                    <td>
+                        {% if season.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#editSeasonModal{{ season.id }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal"
+                            data-bs-target="#deleteSeasonModal{{ season.id }}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        No seasons found. Click "Add New Season" to create one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% for season in seasons %}
+<!-- Edit Season Modal -->
+<div class="modal fade" id="editSeasonModal{{ season.id }}" tabindex="-1"
+    aria-labelledby="editSeasonModalLabel{{ season.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'staff_seasons' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="season_id" value="{{ season.id }}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSeasonModalLabel{{ season.id }}">Edit Season</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name{{ season.id }}" class="form-label">Season Name</label>
+                        <input type="text" class="form-control" id="name{{ season.id }}" name="name"
+                            value="{{ season.name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image{{ season.id }}" class="form-label">Banner Image</label>
+                        <input type="file" class="form-control" id="banner_image{{ season.id }}" name="banner_image"
+                            accept="image/*">
+                        {% if season.banner_image %}
+                        <small class="text-muted d-block mt-1">Current image: {{ season.banner_image.name }}</small>
+                        <img src="{{ season.banner_image.url }}" alt="Preview" class="img-thumbnail mt-2"
+                            style="max-height: 100px;">
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description{{ season.id }}" class="form-label">Description</label>
+                        <textarea class="form-control" id="description{{ season.id }}" name="description"
+                            rows="3">{{ season.description }}</textarea>
+                    </div>
+
+                    <div class="mb-3 form-check ps-4 pt-2">
+                        <input type="checkbox" class="form-check-input" id="is_active{{ season.id }}" name="is_active"
+                            {% if season.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active{{ season.id }}">Is Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Season Modal -->
+<div class="modal fade" id="deleteSeasonModal{{ season.id }}" tabindex="-1"
+    aria-labelledby="deleteSeasonModalLabel{{ season.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'staff_seasons' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="season_id" value="{{ season.id }}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteSeasonModalLabel{{ season.id }}">
+                        Delete Season</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the season <strong>{{ season.name }}</strong>?</p>
+                    <p class="text-danger small"><i class="fas fa-exclamation-triangle"></i> This action cannot be
+                        undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Add Season Modal -->
+<div class="modal fade" id="addSeasonModal" tabindex="-1" aria-labelledby="addSeasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'staff_seasons' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSeasonModalLabel">Add New Season</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Season Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required
+                            placeholder="e.g., Summer Collection 2026">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="banner_image" class="form-label">Banner Image</label>
+                        <input type="file" class="form-control" id="banner_image" name="banner_image" accept="image/*"
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                            placeholder="Description of the season..."></textarea>
+                    </div>
+
+                    <div class="mb-3 form-check ps-4 pt-2">
+                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+                        <label class="form-check-label" for="is_active">Is Active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Season</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

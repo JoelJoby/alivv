@@ -1,0 +1,72 @@
+{% extends 'employee/employee_base.html' %}
+
+{% block title %}All Product Images - Alivv{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="mb-0 text-dark" style="font-weight: 600;">Product Images</h2>
+        <p class="text-muted mb-0">Select a product to view or manage its additional images.</p>
+    </div>
+</div>
+
+<div class="card content-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" style="width: 80px;">Thumbnail</th>
+                    <th scope="col">Product Information</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Added Images</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-thumbnail"
+                            style="width: 60px; height: 60px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+                            style="width: 60px; height: 60px;">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ product.name }}</div>
+                        <div class="text-muted small">ID: #{{ product.id }} | Price: ${{ product.price }}</div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border">{{ product.category.name }}</span>
+                    </td>
+                    <td>
+                        <span
+                            class="badge rounded-pill {% if product.images.count > 0 %}bg-info{% else %}bg-secondary{% endif %}">
+                            {{ product.images.count }} image{{ product.images.count|pluralize }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{% url 'staff_product_images' product.id %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-images me-1"></i> Manage Images
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="fas fa-box-open fa-3x mb-3 text-light"></i>
+                        <h5>No products found</h5>
+                        <p>Go to the Products page to create your first product.</p>
+                        <a href="{% url 'staff_products' %}" class="btn btn-outline-primary mt-2">Go to Products</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
