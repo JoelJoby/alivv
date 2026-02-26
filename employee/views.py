@@ -379,3 +379,100 @@ def staff_seasons(request):
 
     seasons = Season.objects.all().order_by('-id')
     return render(request, 'employee/seasons.html', {'seasons': seasons, 'staff': staff})
+
+@staff_login_required
+def staff_sizes(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    from website.models import Size
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            code = request.POST.get('code', '')
+            
+            size = Size(name=name, code=code)
+            size.save()
+            messages.success(request, f"Size '{name}' added successfully.")
+            
+        elif action == 'edit':
+            size_id = request.POST.get('size_id')
+            try:
+                size = Size.objects.get(id=size_id)
+                size.name = request.POST.get('name')
+                size.code = request.POST.get('code', '')
+                size.save()
+                messages.success(request, f"Size '{size.name}' updated successfully.")
+            except Size.DoesNotExist:
+                messages.error(request, "Size not found.")
+                
+        elif action == 'delete':
+            size_id = request.POST.get('size_id')
+            try:
+                size = Size.objects.get(id=size_id)
+                name = size.name
+                size.delete()
+                messages.success(request, f"Size '{name}' deleted successfully.")
+            except Size.DoesNotExist:
+                messages.error(request, "Size not found.")
+                
+        return redirect('staff_sizes')
+
+    sizes = Size.objects.all().order_by('-id')
+    return render(request, 'employee/sizes.html', {'sizes': sizes, 'staff': staff})
+
+@staff_login_required
+def staff_testimonials(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    from website.models import Testimonial
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            name = request.POST.get('name')
+            remark = request.POST.get('remark')
+            image = request.FILES.get('image')
+            
+            testimonial = Testimonial(name=name, remark=remark)
+            if image:
+                testimonial.image = image
+            testimonial.save()
+            messages.success(request, f"Testimonial from '{name}' added successfully.")
+            
+        elif action == 'edit':
+            testimonial_id = request.POST.get('testimonial_id')
+            try:
+                testimonial = Testimonial.objects.get(id=testimonial_id)
+                testimonial.name = request.POST.get('name')
+                testimonial.remark = request.POST.get('remark')
+                if request.FILES.get('image'):
+                    testimonial.image = request.FILES.get('image')
+                testimonial.save()
+                messages.success(request, f"Testimonial from '{testimonial.name}' updated successfully.")
+            except Testimonial.DoesNotExist:
+                messages.error(request, "Testimonial not found.")
+                
+        elif action == 'delete':
+            testimonial_id = request.POST.get('testimonial_id')
+            try:
+                testimonial = Testimonial.objects.get(id=testimonial_id)
+                name = testimonial.name
+                testimonial.delete()
+                messages.success(request, f"Testimonial from '{name}' deleted successfully.")
+            except Testimonial.DoesNotExist:
+                messages.error(request, "Testimonial not found.")
+                
+        return redirect('staff_testimonials')
+
+    testimonials = Testimonial.objects.all().order_by('-id')
+    return render(request, 'employee/testimonials.html', {'testimonials': testimonials, 'staff': staff})
