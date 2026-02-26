@@ -10,8 +10,13 @@
             <div class="col-md-5">
                 <div class="banner_text">
                     <div class="banner_text_iner" style="padding-left: 7px;">
+                        {% if season %}
+                        <h1>{{ season.name }}</h1>
+                        <p>{{ season.description }}</p>
+                        {% else %}
                         <h1>ALIV</h1>
                         <p>Fashion That Feels Alive</p>
+                        {% endif %}
                         <a href="product_list.html" class="btn_1">shop now</a>
                     </div>
                 </div>
