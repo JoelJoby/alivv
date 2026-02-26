@@ -203,7 +203,8 @@
                     class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_products' %}active{% endif %}">
                     <i class="fas fa-box"></i> Products
                 </a>
-                <a href="#" class="list-group-item list-group-item-action">
+                <a href="{% url 'staff_all_product_images' %}"
+                    class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'staff_all_product_images' or request.resolver_match.url_name == 'staff_product_images' %}active{% endif %}">
                     <i class="fas fa-images"></i> Product Images
                 </a>
                 <a href="#" class="list-group-item list-group-item-action">

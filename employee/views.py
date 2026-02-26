@@ -264,3 +264,63 @@ def staff_products(request):
         'categories': categories,
         'sizes_all': sizes_all
     })
+
+@staff_login_required
+def staff_all_product_images(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    products = Product.objects.all().order_by('-id').prefetch_related('images')
+    return render(request, 'employee/all_product_images.html', {
+        'products': products, 
+        'staff': staff
+    })
+
+@staff_login_required
+def staff_product_images(request, product_id):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    try:
+        product = Product.objects.get(id=product_id)
+    except Product.DoesNotExist:
+        messages.error(request, "Product not found.")
+        return redirect('staff_products')
+
+    from website.models import ProductImage
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add_images':
+            images = request.FILES.getlist('images')
+            count = 0
+            for img in images:
+                ProductImage.objects.create(product=product, image=img)
+                count += 1
+            if count > 0:
+                messages.success(request, f"Added {count} image(s) to '{product.name}'.")
+            else:
+                messages.warning(request, "No images selected to upload.")
+                
+        elif action == 'delete_image':
+            image_id = request.POST.get('image_id')
+            try:
+                img = ProductImage.objects.get(id=image_id, product=product)
+                img.delete()
+                messages.success(request, "Image deleted successfully.")
+            except ProductImage.DoesNotExist:
+                messages.error(request, "Image not found.")
+                
+        return redirect('staff_product_images', product_id=product.id)
+        
+    images = product.images.all()
+    return render(request, 'employee/product_images.html', {
+        'product': product,
+        'images': images,
+        'staff': staff
+    })
