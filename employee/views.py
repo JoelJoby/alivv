@@ -476,3 +476,30 @@ def staff_testimonials(request):
 
     testimonials = Testimonial.objects.all().order_by('-id')
     return render(request, 'employee/testimonials.html', {'testimonials': testimonials, 'staff': staff})
+
+@staff_login_required
+def staff_subscribers(request):
+    try:
+        staff = Staff.objects.get(id=request.session['staff_id'])
+    except Staff.DoesNotExist:
+        return redirect('staff_login')
+        
+    from website.models import Subscriber
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'delete':
+            subscriber_id = request.POST.get('subscriber_id')
+            try:
+                subscriber = Subscriber.objects.get(id=subscriber_id)
+                email = subscriber.email
+                subscriber.delete()
+                messages.success(request, f"Subscriber '{email}' deleted successfully.")
+            except Subscriber.DoesNotExist:
+                messages.error(request, "Subscriber not found.")
+                
+        return redirect('staff_subscribers')
+
+    subscribers = Subscriber.objects.all().order_by('-id')
+    return render(request, 'employee/subscribers.html', {'subscribers': subscribers, 'staff': staff})

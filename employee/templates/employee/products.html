@@ -138,6 +138,8 @@
                             {% if product.image %}
                             <small class="text-muted d-block mt-1">Current image: {{ product.image.name }}</small>
                             {% endif %}
+                            <small class="form-text text-muted">Please upload an image for the product in 360*380
+                                resolution.</small>
                         </div>
                     </div>
 
@@ -152,10 +154,16 @@
                         <div>
                             {% for size in sizes_all %}
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" name="sizes"
-                                    id="size_{{ product.id }}_{{ size.id }}" value="{{ size.id }}" {% if size in product.sizes.all %}checked{% endif %}>
-                                <label class="form-check-label" for="size_{{ product.id }}_{{ size.id }}">{{ size.name
-                                    }}</label>
+                                <input class="form-check-input" 
+                                    type="checkbox" 
+                                    name="sizes" 
+                                    id="size_{{ product.id }}_{{ size.id }}" 
+                                    value="{{ size.id }}"
+                                    {% if size in product.sizes.all %}checked{% endif %}>
+                                <label class="form-check-label" 
+                                    for="size_{{ product.id }}_{{ size.id }}">
+                                    {{ size.name }}
+                                </label>
                             </div>
                             {% endfor %}
                         </div>
@@ -184,11 +192,14 @@
                                 name="is_top_product" {% if product.is_top_product %}checked{% endif %}>
                             <label class="form-check-label" for="is_top_product{{ product.id }}">Mark as Top
                                 Product</label>
+                            <small class="form-text text-muted d-block">Mark as Top Product (max 6)</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="priority{{ product.id }}" class="form-label">Priority (For Top Products)</label>
                             <input type="number" class="form-control" id="priority{{ product.id }}" name="priority"
                                 value="{{ product.priority }}" min="0">
+                            <small class="form-text text-muted">Use numbers 1 to 6 for top product priority. Leave 0 if
+                                not top.</small>
                         </div>
                     </div>
                 </div>
@@ -270,6 +281,8 @@
                         <div class="col-md-6 mb-3">
                             <label for="image" class="form-label">Image</label>
                             <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <small class="form-text text-muted">Please upload an image for the product in 360*380
+                                resolution.</small>
                         </div>
                     </div>
 
@@ -284,9 +297,16 @@
                         <div>
                             {% for size in sizes_all %}
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" name="sizes" id="size_add_{{ size.id }}"
-                                    value="{{ size.id }}">
-                                <label class="form-check-label" for="size_add_{{ size.id }}">{{ size.name }}</label>
+                                <input class="form-check-input" 
+                                    type="checkbox" 
+                                    name="sizes" 
+                                    id="size_{{ product.id }}_{{ size.id }}" 
+                                    value="{{ size.id }}"
+                                    {% if size in product.sizes.all %}checked{% endif %}>
+                                <label class="form-check-label" 
+                                    for="size_{{ product.id }}_{{ size.id }}">
+                                    {{ size.name }}
+                                </label>
                             </div>
                             {% endfor %}
                         </div>
@@ -312,10 +332,13 @@
                         <div class="col-md-6 mb-3 form-check ps-4 pt-2">
                             <input type="checkbox" class="form-check-input" id="is_top_product" name="is_top_product">
                             <label class="form-check-label" for="is_top_product">Mark as Top Product</label>
+                            <small class="form-text text-muted d-block">Mark as Top Product (max 6)</small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="priority" class="form-label">Priority (For Top Products)</label>
                             <input type="number" class="form-control" id="priority" name="priority" value="0" min="0">
+                            <small class="form-text text-muted">Use numbers 1 to 6 for top product priority. Leave 0 if
+                                not top.</small>
                         </div>
                     </div>
 
