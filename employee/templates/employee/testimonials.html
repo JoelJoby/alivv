@@ -1,0 +1,209 @@
+{% extends 'employee/employee_base.html' %}
+
+{% block title %}Testimonials Management - Alivv{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h2 class="mb-0 text-dark" style="font-weight: 600;">Testimonials Management</h2>
+        <p class="text-muted mb-0">Manage customer reviews and feedback.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTestimonialModal">
+            <i class="fas fa-plus-circle me-1"></i> Add New Testimonial
+        </button>
+    </div>
+</div>
+
+{% if messages %}
+<div class="row">
+    <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card content-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Remark</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for testimonial in testimonials %}
+                <tr>
+                    <td>#{{ testimonial.id }}</td>
+                    <td>
+                        {% if testimonial.image %}
+                        <img src="{{ testimonial.image.url }}" alt="{{ testimonial.name }}" class="rounded-circle"
+                            style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+                    <td class="fw-bold">{{ testimonial.name }}</td>
+                    <td>{{ testimonial.remark|truncatechars:50 }}</td>
+                    <td class="text-end" style="min-width: 160px;">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#editTestimonialModal{{ testimonial.id }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" data-bs-toggle="modal"
+                            data-bs-target="#deleteTestimonialModal{{ testimonial.id }}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Edit Testimonial Modal -->
+                <div class="modal fade" id="editTestimonialModal{{ testimonial.id }}" tabindex="-1"
+                    aria-labelledby="editTestimonialModalLabel{{ testimonial.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content text-start">
+                            <form method="POST" action="{% url 'staff_testimonials' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="edit">
+                                <input type="hidden" name="testimonial_id" value="{{ testimonial.id }}">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editTestimonialModalLabel{{ testimonial.id }}">Edit
+                                        Testimonial</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label for="name{{ testimonial.id }}" class="form-label">Customer Name</label>
+                                        <input type="text" class="form-control" id="name{{ testimonial.id }}"
+                                            name="name" value="{{ testimonial.name }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="image{{ testimonial.id }}" class="form-label">Customer Image</label>
+                                        <input type="file" class="form-control" id="image{{ testimonial.id }}"
+                                            name="image" accept="image/*">
+                                        {% if testimonial.image %}
+                                        <small class="text-muted d-block mt-1">Current image: {{ testimonial.image.name
+                                            }}</small>
+                                        <img src="{{ testimonial.image.url }}" alt="Preview" class="img-thumbnail mt-2"
+                                            style="height: 50px; width: 50px; object-fit: cover; border-radius: 50%;">
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="remark{{ testimonial.id }}" class="form-label">Remark</label>
+                                        <textarea class="form-control" id="remark{{ testimonial.id }}" name="remark"
+                                            rows="4" required>{{ testimonial.remark }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Testimonial Modal -->
+                <div class="modal fade" id="deleteTestimonialModal{{ testimonial.id }}" tabindex="-1"
+                    aria-labelledby="deleteTestimonialModalLabel{{ testimonial.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content text-start">
+                            <form method="POST" action="{% url 'staff_testimonials' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="testimonial_id" value="{{ testimonial.id }}">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title text-danger"
+                                        id="deleteTestimonialModalLabel{{ testimonial.id }}">
+                                        Delete Testimonial</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the testimonial from <strong>{{ testimonial.name
+                                            }}</strong>?</p>
+                                    <p class="text-danger small"><i class="fas fa-exclamation-triangle"></i> This action
+                                        cannot be
+                                        undone.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        No testimonials found. Click "Add New Testimonial" to create one.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Testimonial Modal -->
+<div class="modal fade" id="addTestimonialModal" tabindex="-1" aria-labelledby="addTestimonialModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{% url 'staff_testimonials' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTestimonialModalLabel">Add New Testimonial</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required
+                            placeholder="e.g., Jane Doe">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Customer Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="remark" class="form-label">Remark</label>
+                        <textarea class="form-control" id="remark" name="remark" rows="4" required
+                            placeholder="Customer feedback goes here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Testimonial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -12,4 +12,5 @@ urlpatterns = [
     path('products/<int:product_id>/images/', views.staff_product_images, name='staff_product_images'),
     path('seasons/', views.staff_seasons, name='staff_seasons'),
     path('sizes/', views.staff_sizes, name='staff_sizes'),
+    path('testimonials/', views.staff_testimonials, name='staff_testimonials'),
 ]
