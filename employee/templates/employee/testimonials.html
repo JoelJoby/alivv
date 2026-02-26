@@ -98,7 +98,11 @@
                                             name="image" accept="image/*">
                                         {% if testimonial.image %}
                                         <small class="text-muted d-block mt-1">
-                                            Current image: {{ testimonial.image.name }}</small>
+                                            Current image: {{ testimonial.image.name }}
+                                        </small>
+                                        <small class="form-text text-muted">
+                                            Please upload an image for the Home Page in 105*105 resolution.
+                                        </small>
                                         <img src="{{ testimonial.image.url }}" alt="Preview" class="img-thumbnail mt-2"
                                             style="height: 50px; width: 50px; object-fit: cover; border-radius: 50%;">
                                         {% endif %}
@@ -189,6 +193,9 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">Customer Image</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <small class="form-text text-muted">
+                            Please upload an image for the Home Page in 105*105 resolution.
+                        </small>
                     </div>
 
                     <div class="mb-3">

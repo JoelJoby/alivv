@@ -114,11 +114,12 @@
                             accept="image/*">
                         {% if season.banner_image %}
                         <small class="text-muted d-block mt-1">Current image: {{ season.banner_image.name }}</small>
+                        <small class="form-text text-muted">Upload an image for the Home Page in 1080*800
+                            resolution.</small>
                         <img src="{{ season.banner_image.url }}" alt="Preview" class="img-thumbnail mt-2"
                             style="max-height: 100px;">
                         {% endif %}
-                        <small class="form-text text-muted">Please upload an image for the Home Page Banner in 1080*800
-                            resolution.</small>
+
                     </div>
 
                     <div class="mb-3">
