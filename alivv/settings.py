@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from django.contrib.messages import constants as messages
 from pathlib import Path
 import os
 from decouple import config
@@ -30,6 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+WHATSAPP_NUMBER = config('WHATSAPP_NUMBER', default='918078956972')
 
 
 # Application definition
@@ -164,7 +166,6 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
